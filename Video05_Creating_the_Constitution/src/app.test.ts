@@ -24,6 +24,35 @@ describe('/dashboard', () => {
     expect(body).toContain('<header class="site-header">')
     expect(body).toContain('<footer class="site-footer">')
   })
+
+  it('renders ailments, therapies, and appointments sourced from the store', async () => {
+    await app.request('/api/ailments', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        agentId: 'agent-dashboard',
+        category: 'reliability',
+        title: 'Dashboard-visible ailment',
+        description: 'Should show up in the dashboard ailments table.',
+      }),
+    })
+    const slotId = (await (await app.request('/api/slots')).json())[0].id
+    await app.request('/api/appointments', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        agentId: 'agent-dashboard',
+        therapyId: 1,
+        slotId,
+      }),
+    })
+
+    const body = await (await app.request('/dashboard')).text()
+
+    expect(body).toContain('Dashboard-visible ailment')
+    expect(body).toContain('Timeout Tuning Session')
+    expect(body).toContain('agent-dashboard')
+  })
 })
 
 describe('/styles.css', () => {

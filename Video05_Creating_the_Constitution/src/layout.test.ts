@@ -9,6 +9,7 @@ describe('layout', () => {
     expect(html).toContain(
       '<meta name="viewport" content="width=device-width, initial-scale=1.0" />'
     )
+    expect(html).toContain('cdn.jsdelivr.net/npm/@picocss/pico')
     expect(html).toContain('<link rel="stylesheet" href="/styles.css" />')
     expect(html).toContain('<header class="site-header">')
     expect(html).toContain('<main class="content">')

@@ -1,13 +1,6 @@
-:root {
-  color-scheme: light;
-  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
-}
-
-body {
-  margin: 0;
-  background: #f7f7f8;
-  color: #1a1a1a;
-}
+/* Base typography, color scheme (incl. dark mode), and spacing come from
+   PicoCSS (see layout.ts). Only AgentClinic-specific brand styling that
+   Pico doesn't provide lives here. */
 
 .site-header {
   display: flex;

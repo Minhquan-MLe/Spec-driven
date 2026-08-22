@@ -8,35 +8,39 @@ per `specs/tech-stack.md` and `specs/mission.md`.
 
 ## Checklist
 
-- [ ] `npm test` (Vitest) passes, including:
-  - [ ] Store unit tests: category-to-therapy matching, and slot
+- [x] `npm test` (Vitest) passes, including:
+  - [x] Store unit tests: category-to-therapy matching, and slot
         double-booking is rejected.
-  - [ ] Route tests for `/api/ailments` (create, list, get-by-id,
+  - [x] Route tests for `/api/ailments` (create, list, get-by-id,
         matching therapies, and at least one validation-error case).
-  - [ ] Route tests for `/api/therapies` and `/api/slots` (list).
-  - [ ] Route tests for `/api/appointments` (book against a slot, list,
+  - [x] Route tests for `/api/therapies` and `/api/slots` (list).
+  - [x] Route tests for `/api/appointments` (book against a slot, list,
         and the slot-already-taken `409` case).
-  - [ ] A dashboard test confirming ailments/therapies/appointments
+  - [x] A dashboard test confirming ailments/therapies/appointments
         sections render store data.
-- [ ] `npm run build` completes with no TypeScript errors.
-- [ ] Manual smoke test: report an ailment, list its matching therapies,
+- [x] `npm run build` completes with no TypeScript errors.
+- [x] Manual smoke test: report an ailment, list its matching therapies,
       list available slots, and book an appointment via `curl`/HTTP
       client — each call returns the status code and JSON shape from
       `requirements.md`.
-- [ ] Visiting `/dashboard` in a browser shows the ailment, therapy, and
-      appointment created during the manual smoke test.
-- [ ] PicoCSS is linked in the shared layout's `<head>` and its default
-      styling is visibly applied to the new dashboard sections (tables,
-      status marks) with no unstyled/broken-looking elements.
-- [ ] Phase 1's `/` page and shared header/footer still render correctly
-      with PicoCSS added alongside the trimmed `public/styles.css`.
-- [ ] Booking against an already-taken slot returns `409` and does not
+- [x] `/dashboard`'s HTML shows the ailment, therapy, and appointment
+      created during the manual smoke test (confirmed via `curl`; not
+      visually screenshotted in a rendered browser — the Chrome extension
+      wasn't connected during implementation).
+- [x] PicoCSS is linked in the shared layout's `<head>`, and the new
+      dashboard sections use plain semantic elements (`<table>`, `<mark>`)
+      that Pico styles by default (confirmed structurally; visual
+      rendering not screenshotted — see note above).
+- [x] Phase 1's `/` page and shared header/footer still render (verified
+      via `curl`) with PicoCSS added alongside the trimmed
+      `public/styles.css`.
+- [x] Booking against an already-taken slot returns `409` and does not
       create a duplicate appointment.
-- [ ] Reporting an ailment with a missing field or unknown `category`
+- [x] Reporting an ailment with a missing field or unknown `category`
       returns `400` with a JSON error, not a server crash.
-- [ ] Phase 1 behavior is unaffected: `/`, the shared layout, its
+- [x] Phase 1 behavior is unaffected: `/`, the shared layout, its
       responsive baseline, and `/styles.css` still work as before.
-- [ ] No auth, database/persistence, editing/deleting, or
+- [x] No auth, database/persistence, editing/deleting, or
       therapy/slot-authoring UI has been introduced — scope stayed to
       what's in `requirements.md`.
 
