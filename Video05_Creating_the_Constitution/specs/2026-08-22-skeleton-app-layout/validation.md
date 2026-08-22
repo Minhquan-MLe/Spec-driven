@@ -2,12 +2,16 @@
 
 ## How to know this phase succeeded
 
-This phase is validated by manual smoke test — no automated test tooling
-is introduced yet, per the requirements.
+This phase is validated by automated Vitest tests plus a manual smoke
+test, per `specs/tech-stack.md`.
 
 ## Checklist
 
-- [x] `npm run build` completes with no TypeScript errors.
+- [x] `npm test` (Vitest) passes: unit tests for `header`/`main`/`footer`,
+      a test for `layout()` composing them around a title/content and
+      linking `/styles.css`, and route tests for `/` and `/dashboard`.
+- [x] `npm run build` completes with no TypeScript errors, and test files
+      are excluded from the compiled `dist/` output.
 - [x] `npm start` (or equivalent) boots the Hono server without crashing.
 - [x] Visiting `/` in a browser renders the shared layout — header (with
       nav placeholder), main content area, and footer — with no console
@@ -29,5 +33,5 @@ is introduced yet, per the requirements.
 
 All checklist items pass and the diff contains only what's in scope per
 `requirements.md` (server bootstrap, layout, two routes, minimal
-AgentClinic home page content, minimal static styling). No unrelated
-changes.
+AgentClinic home page content, minimal static styling, Vitest tests). No
+unrelated changes.

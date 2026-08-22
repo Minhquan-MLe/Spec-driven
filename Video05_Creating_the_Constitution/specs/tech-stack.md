@@ -29,6 +29,13 @@
 - Revisit whether a client-side framework is needed once the dashboard's
   interactivity requirements are clearer.
 
+## Testing
+
+- **Vitest** for validation/automated tests once a phase's requirements
+  call for them. Fast, TypeScript-native, and low-config alongside the
+  existing `tsc` build.
+- Run via a `test` script in `package.json` (`vitest run`).
+
 ## Data
 
 - No database is committed to yet. Early phases can use in-memory or static

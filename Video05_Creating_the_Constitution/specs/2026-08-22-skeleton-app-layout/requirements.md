@@ -27,7 +27,6 @@ Roadmap Phase 1 (`specs/roadmap.md`): "Skeleton app + basic layout."
   Phases 2–4.
 - Real navigation links, styling polish, or responsive design — deferred to
   Phase 5 per the roadmap.
-- Automated tests / test tooling — not part of this phase.
 - Auth, database, deployment config.
 
 ## Decisions
@@ -47,6 +46,10 @@ Roadmap Phase 1 (`specs/roadmap.md`): "Skeleton app + basic layout."
   page's copy is hardcoded, not sourced from a data model.
 - **Home page content:** minimal and static — a heading, one line of
   description, and a link to `/dashboard`. No marketing copy or imagery.
+- **Testing:** automated tests via **Vitest** (per `specs/tech-stack.md`),
+  run with `npm test`. The Hono app is exported separately from server
+  startup (`src/app.ts` vs. `src/index.ts`) so routes can be exercised in
+  tests via `app.request()` without binding a port.
 
 ## Context
 
