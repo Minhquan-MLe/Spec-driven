@@ -4,7 +4,7 @@ High-level implementation order, broken into small phases. Each phase should
 be small enough to spec, build, and validate on its own before moving to the
 next.
 
-## Phase 1 — Skeleton app + basic layout
+## Phase 1 — Skeleton app + basic layout (Complete)
 
 - Stand up a minimal Hono server on top of the existing TypeScript scaffold.
 - Add a basic page layout / shell (header, nav placeholder, content area)

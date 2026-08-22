@@ -39,6 +39,10 @@ Roadmap Phase 1 (`specs/roadmap.md`): "Skeleton app + basic layout."
   subcomponents (`header`, `main`, `footer`) under `src/components/`, used
   by both routes so later phases add pages without re-deriving the shell.
   Navigation lives inside the `header` subcomponent.
+- **File structure:** each subcomponent lives in its own file
+  (`src/components/header.ts`, `src/components/main.ts`,
+  `src/components/footer.ts`), not bundled together, so each can be
+  edited/extended independently as later phases add real content.
 - **Data:** none — both routes render static content only; the home
   page's copy is hardcoded, not sourced from a data model.
 - **Home page content:** minimal and static — a heading, one line of

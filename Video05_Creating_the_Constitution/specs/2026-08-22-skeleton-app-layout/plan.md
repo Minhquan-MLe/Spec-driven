@@ -16,9 +16,12 @@ before moving to the next.
 2.1. Add a shared layout function composed of three subcomponents: a
      `header` (brand + nav placeholder), a `main` (content area), and a
      `footer`.
-2.2. Keep it framework-free — plain HTML strings/JSX-via-Hono, no client
+2.2. Put each subcomponent in its own file under `src/components/`
+     (`header.ts`, `main.ts`, `footer.ts`), imported by the shared layout
+     — not one combined components file.
+2.3. Keep it framework-free — plain HTML strings/JSX-via-Hono, no client
      framework.
-2.3. Link the shared stylesheet (`/styles.css`) in the layout's `<head>`,
+2.4. Link the shared stylesheet (`/styles.css`) in the layout's `<head>`,
      and confirm it's actually reachable via the static file middleware.
 
 ## 3. Routes
