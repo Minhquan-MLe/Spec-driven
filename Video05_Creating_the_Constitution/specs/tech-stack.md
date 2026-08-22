@@ -31,8 +31,16 @@
 - **Responsive design is a baseline requirement, not deferred polish**:
   fluid/relative units (`%`, `rem`, `max-width`) over fixed pixel widths, a
   `<meta name="viewport">` tag, and CSS media query breakpoints wherever a
-  fixed-width layout would break on mobile/tablet screens. Plain CSS is
-  sufficient — no responsive framework (e.g. Bootstrap) is needed yet.
+  fixed-width layout would break on mobile/tablet screens.
+- **PicoCSS** for base styling, linked from the shared layout's `<head>`.
+  It's a classless/semantic-HTML CSS framework — plain `<header>`,
+  `<nav>`, `<main>`, `<button>`, `<table>`, form elements, etc. get
+  sensible, responsive, light/dark-aware styling with no utility-class
+  soup, which keeps markup close to plain HTML per Steve's "attractive,
+  modern browser" requirement without hand-rolling a design system.
+  Supersedes the from-scratch `public/styles.css` written in Phase 1;
+  only AgentClinic-specific touches (e.g. brand mark) stay as custom CSS
+  layered on top.
 
 ## Testing
 
