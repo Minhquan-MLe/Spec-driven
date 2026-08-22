@@ -16,7 +16,10 @@ per the decision made when starting it.
 - `POST /api/ailments` — an agent reports an ailment. Validates required
   fields (`agentId`, `category`, `title`, `description`) and that
   `category` is one of the known categories; returns `201` with the
-  created ailment or `400` with an error message.
+  created ailment or `400` with an error message. Accepts an optional
+  `Idempotency-Key` header — a repeated request with the same key replays
+  the original `201` response instead of creating a duplicate ailment
+  (see Decisions).
 - `GET /api/ailments` — list all ailments (newest first).
 - `GET /api/ailments/:id` — fetch one ailment; `404` if not found.
 - The staff dashboard (`/dashboard`) lists all reported ailments (id,
@@ -107,6 +110,16 @@ per the decision made when starting it.
   with three sections (ailments, therapies, appointments) reading from the
   same store the API writes to — proving the two interfaces share state,
   not independently mocked data.
+- **Idempotency:** `POST /api/ailments` and `POST /api/appointments` both
+  recognize an optional `Idempotency-Key` request header
+  (`src/idempotency.ts`). The first request with a given key is processed
+  and its response cached against that key; a retried request with the
+  same key returns the cached response rather than creating a second
+  record. Keys are namespaced per route (e.g. `ailments:<key>`,
+  `appointments:<key>`) and, like all other storage in this phase, kept
+  in memory only. Added to protect agents from accidental duplicate
+  submissions on retry (e.g. a dropped response after the write already
+  succeeded), without requiring agents to de-duplicate client-side.
 - **Testing:** Vitest, following the pattern established in Phase 1 —
   route tests via `app.request()` for each new endpoint (success and
   validation-error cases), plus unit tests for the store's matching logic
