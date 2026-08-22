@@ -44,7 +44,7 @@ support them a reliable way to see and act on that inflow.
 - **Susan (product)** wants the core feature set built around agents,
   ailments, therapies, and appointment booking.
 - **Steve (marketing)** wants an attractive site that works well in a modern
-  browser.
+  browser, responsively across desktop, tablet, and mobile screen sizes.
 
 ## Success looks like
 
@@ -54,3 +54,5 @@ support them a reliable way to see and act on that inflow.
   on it.
 - The site is fast, reliable, and presentable enough to demo to
   non-technical stakeholders.
+- The UI is responsive — usable and legible on mobile, tablet, and desktop
+  viewport widths, not just a fixed desktop layout.

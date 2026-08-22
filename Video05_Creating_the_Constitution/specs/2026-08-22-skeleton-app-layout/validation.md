@@ -26,6 +26,9 @@ test, per `specs/tech-stack.md`.
       with placeholder dashboard content, with no console errors.
 - [x] The two routes visibly share the same layout markup/styling (not
       independently hand-rolled pages).
+- [x] The layout ships a `<meta name="viewport">` tag, fluid/relative
+      units, and a media query breakpoint; the header stacks (not
+      overlaps/overflows) at narrow/mobile viewport widths.
 - [x] No domain logic (ailments/therapies/booking), persistence, or auth
       has been introduced — scope stayed to the skeleton.
 

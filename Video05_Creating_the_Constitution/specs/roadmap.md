@@ -8,7 +8,8 @@ next.
 
 - Stand up a minimal Hono server on top of the existing TypeScript scaffold.
 - Add a basic page layout / shell (header, nav placeholder, content area)
-  shared across pages.
+  shared across pages, responsive from the start (see `tech-stack.md`) —
+  not deferred to Phase 5.
 - Add a stub dashboard route so staff have a landing page, even with no real
   data yet.
 - Goal: prove the stack runs end to end and looks presentable before any
@@ -35,8 +36,9 @@ next.
 
 ## Phase 5 — Polish & hardening
 
-- Responsive/visual polish for the dashboard and agent-facing pages (Steve's
-  "attractive, modern browser" requirement).
+- Deeper visual polish for the dashboard and agent-facing pages, beyond the
+  responsive baseline established in Phase 1 (Steve's "attractive, modern
+  browser" requirement).
 - Basic validation and error handling across the flows above.
 - Revisit persistence, auth, and deployment needs based on what's been
   learned building Phases 1–4.

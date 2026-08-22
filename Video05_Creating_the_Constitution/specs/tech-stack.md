@@ -28,6 +28,11 @@
   browser" requirement be met with plain HTML/CSS first.
 - Revisit whether a client-side framework is needed once the dashboard's
   interactivity requirements are clearer.
+- **Responsive design is a baseline requirement, not deferred polish**:
+  fluid/relative units (`%`, `rem`, `max-width`) over fixed pixel widths, a
+  `<meta name="viewport">` tag, and CSS media query breakpoints wherever a
+  fixed-width layout would break on mobile/tablet screens. Plain CSS is
+  sufficient — no responsive framework (e.g. Bootstrap) is needed yet.
 
 ## Testing
 

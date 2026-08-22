@@ -43,11 +43,16 @@ before moving to the next.
      needed to make the homepage recognizably AgentClinic rather than a
      blank placeholder.
 
-## 5. Static assets / minimal styling
+## 5. Static assets / minimal responsive styling
 
 5.1. Add a small stylesheet (served as a static asset) so the shell looks
-     intentional rather than unstyled — no responsive/visual polish, just
-     enough to not look broken.
+     intentional rather than unstyled — no deep visual polish, just enough
+     to not look broken.
+5.2. Use fluid/relative units (`%`, `rem`, `max-width`) rather than fixed
+     pixel widths, and confirm the layout's `<meta name="viewport">` tag
+     is present (per `specs/tech-stack.md`).
+5.3. Add a media query breakpoint so `.site-header` stacks vertically
+     (instead of overflowing) at narrow/mobile widths.
 
 ## 6. Automated tests (Vitest)
 
@@ -72,5 +77,8 @@ before moving to the next.
 7.4. Confirm both pages render a header (with nav placeholder), a main
      content area, and a footer, and that `/styles.css` loads (200
      response, applied styling visible).
-7.5. Confirm `npm run build` succeeds with no TypeScript errors and
+7.5. Resize the browser (or use device emulation) to a narrow/mobile
+     width and confirm the header stacks without overlapping content or
+     causing horizontal scroll.
+7.6. Confirm `npm run build` succeeds with no TypeScript errors and
      `npm test` passes.
