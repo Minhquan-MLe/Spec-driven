@@ -45,7 +45,10 @@ per the decision made when starting it.
   available slot. Body: `{ agentId, therapyId, slotId }`. Validates the
   therapy and slot exist and the slot isn't already taken; marks the slot
   `taken` and creates the appointment. Returns `201`, `400` (missing
-  fields / bad therapy), or `409` (slot already taken).
+  fields / bad therapy), or `409` (slot already taken). Accepts an
+  optional `Idempotency-Key` header — a repeated request with the same
+  key replays the original `201` response instead of booking a second
+  appointment (see Decisions).
 - `GET /api/appointments` — list all booked appointments.
 - The dashboard lists upcoming (booked) appointments.
 
