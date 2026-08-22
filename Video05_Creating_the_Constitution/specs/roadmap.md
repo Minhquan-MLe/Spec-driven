@@ -34,6 +34,19 @@ next.
 - Revisit persistence, auth, and deployment needs based on what's been
   learned building Phase 1 and this phase.
 
+## MVP (Complete)
+
+- Phase 2's "revisit persistence, auth, and deployment needs" note was
+  revisited for the MVP: all three were intentionally left unchanged.
+  In-memory storage, no auth, and no deployment target all still fit
+  `mission.md`'s teaching/conference-booth audience — see
+  `specs/2026-08-22-mvp-hardening/requirements.md` for the full
+  rationale.
+- Verified the responsive dashboard/agent loop against `mission.md`'s
+  "Success looks like" criteria and wrapped dashboard tables in an
+  `overflow-x: auto` container so long unbreakable content (ISO
+  timestamps, agent IDs) scrolls within the table instead of the page.
+
 ## Notes
 
 - This order can change as feature specs are written — the roadmap is a

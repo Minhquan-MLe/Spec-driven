@@ -45,26 +45,32 @@ exports.app.get('/dashboard', (c) => {
 
     <section>
       <h2>Ailments</h2>
-      <table>
-        <thead><tr><th>ID</th><th>Category</th><th>Title</th><th>Status</th></tr></thead>
-        <tbody>${ailmentRows || '<tr><td colspan="4">No ailments reported yet.</td></tr>'}</tbody>
-      </table>
+      <div class="table-responsive">
+        <table>
+          <thead><tr><th>ID</th><th>Category</th><th>Title</th><th>Status</th></tr></thead>
+          <tbody>${ailmentRows || '<tr><td colspan="4">No ailments reported yet.</td></tr>'}</tbody>
+        </table>
+      </div>
     </section>
 
     <section>
       <h2>Therapies</h2>
-      <table>
-        <thead><tr><th>Name</th><th>Categories</th></tr></thead>
-        <tbody>${therapyRows}</tbody>
-      </table>
+      <div class="table-responsive">
+        <table>
+          <thead><tr><th>Name</th><th>Categories</th></tr></thead>
+          <tbody>${therapyRows}</tbody>
+        </table>
+      </div>
     </section>
 
     <section>
       <h2>Appointments</h2>
-      <table>
-        <thead><tr><th>Agent</th><th>Therapy</th><th>Time</th></tr></thead>
-        <tbody>${appointmentRows || '<tr><td colspan="3">No appointments booked yet.</td></tr>'}</tbody>
-      </table>
+      <div class="table-responsive">
+        <table>
+          <thead><tr><th>Agent</th><th>Therapy</th><th>Time</th></tr></thead>
+          <tbody>${appointmentRows || '<tr><td colspan="3">No appointments booked yet.</td></tr>'}</tbody>
+        </table>
+      </div>
     </section>
   `;
     return c.html((0, layout_1.layout)('AgentClinic — Dashboard', content));

@@ -28,6 +28,10 @@
   color: #14213d;
 }
 
+.table-responsive {
+  overflow-x: auto;
+}
+
 .site-footer {
   max-width: 640px;
   margin: 2rem auto 1rem;
