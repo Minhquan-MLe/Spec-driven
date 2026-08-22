@@ -7,19 +7,22 @@ is introduced yet, per the requirements.
 
 ## Checklist
 
-- [ ] `npm run build` completes with no TypeScript errors.
-- [ ] `npm start` (or equivalent) boots the Hono server without crashing.
-- [ ] Visiting `/` in a browser renders the shared layout (header, nav
-      placeholder, content area) with no console errors.
-- [ ] The home page shows an "AgentClinic" heading and a one-line
+- [x] `npm run build` completes with no TypeScript errors.
+- [x] `npm start` (or equivalent) boots the Hono server without crashing.
+- [x] Visiting `/` in a browser renders the shared layout — header (with
+      nav placeholder), main content area, and footer — with no console
+      errors.
+- [x] `/styles.css` is correctly linked in the layout's `<head>` and
+      loads with a 200 response (served via static file middleware).
+- [x] The home page shows an "AgentClinic" heading and a one-line
       description consistent with `specs/mission.md`.
-- [ ] The home page's link to `/dashboard` is present and navigates
+- [x] The home page's link to `/dashboard` is present and navigates
       correctly.
-- [ ] Visiting `/dashboard` in a browser renders the same shared layout
+- [x] Visiting `/dashboard` in a browser renders the same shared layout
       with placeholder dashboard content, with no console errors.
-- [ ] The two routes visibly share the same layout markup/styling (not
+- [x] The two routes visibly share the same layout markup/styling (not
       independently hand-rolled pages).
-- [ ] No domain logic (ailments/therapies/booking), persistence, or auth
+- [x] No domain logic (ailments/therapies/booking), persistence, or auth
       has been introduced — scope stayed to the skeleton.
 
 ## Ready to merge when

@@ -9,8 +9,10 @@ Roadmap Phase 1 (`specs/roadmap.md`): "Skeleton app + basic layout."
 - Stand up a minimal Hono server on Node.js, on top of the existing
   TypeScript scaffold (`hono` and `@hono/node-server` are already
   installed).
-- A shared page layout: header, a nav placeholder (no real links yet), and
-  a content area.
+- A shared page layout composed of three subcomponents: a header (brand +
+  nav placeholder, no real links yet), a main content area, and a footer.
+- The shared stylesheet correctly linked from the layout and served via
+  static file middleware.
 - A minimal `/` home page, using the shared layout, with AgentClinic-
   specific content: an "AgentClinic" heading, a one-line description drawn
   from `specs/mission.md`, and a link to `/dashboard`.
@@ -33,8 +35,10 @@ Roadmap Phase 1 (`specs/roadmap.md`): "Skeleton app + basic layout."
 - **Framework:** Hono + `@hono/node-server`, per `specs/tech-stack.md`.
 - **Rendering:** server-rendered HTML via Hono, no client-side framework
   (per `tech-stack.md`'s "no separate frontend framework yet").
-- **Layout:** a single shared layout component/function used by both
-  routes, so later phases add pages without re-deriving the shell.
+- **Layout:** a single shared layout function, composed of three
+  subcomponents (`header`, `main`, `footer`) under `src/components/`, used
+  by both routes so later phases add pages without re-deriving the shell.
+  Navigation lives inside the `header` subcomponent.
 - **Data:** none — both routes render static content only; the home
   page's copy is hardcoded, not sourced from a data model.
 - **Home page content:** minimal and static — a heading, one line of

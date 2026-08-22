@@ -13,10 +13,13 @@ before moving to the next.
 
 ## 2. Layout component
 
-2.1. Add a shared layout function/component: header, nav placeholder,
-     content area.
+2.1. Add a shared layout function composed of three subcomponents: a
+     `header` (brand + nav placeholder), a `main` (content area), and a
+     `footer`.
 2.2. Keep it framework-free — plain HTML strings/JSX-via-Hono, no client
      framework.
+2.3. Link the shared stylesheet (`/styles.css`) in the layout's `<head>`,
+     and confirm it's actually reachable via the static file middleware.
 
 ## 3. Routes
 
@@ -48,4 +51,7 @@ before moving to the next.
      shared layout without errors.
 6.3. Confirm the home page shows the AgentClinic heading/description and
      that its link to `/dashboard` works.
-6.4. Confirm `npm run build` succeeds with no TypeScript errors.
+6.4. Confirm both pages render a header (with nav placeholder), a main
+     content area, and a footer, and that `/styles.css` loads (200
+     response, applied styling visible).
+6.5. Confirm `npm run build` succeeds with no TypeScript errors.
