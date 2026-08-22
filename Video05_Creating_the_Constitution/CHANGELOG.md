@@ -1,6 +1,7 @@
 # Changelog
 
 ## 2026-08-22
+- Add MVP hardening spec; wrap dashboard tables for mobile overflow
 - Fix HTML injection, input validation, idempotency, and status codes in phase 2 API
 - Implement phase 2
 - Add Phase 2 feature spec (ailments/therapies/appointments) with PicoCSS
