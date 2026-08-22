@@ -5,31 +5,59 @@ import {
   getAilment,
   listAilments,
   therapiesForAilment,
+  type Category,
 } from '../store'
+import { getIdempotentResponse, saveIdempotentResponse } from '../idempotency'
+import { isNonEmptyString, parseJsonBody } from '../validation'
 
 export const ailments = new Hono()
 
 ailments.post('/', async (c) => {
-  const body = await c.req.json().catch(() => null)
-  const agentId = body?.agentId
-  const category = body?.category
-  const title = body?.title
-  const description = body?.description
+  const idempotencyKey = c.req.header('Idempotency-Key')
+  if (idempotencyKey) {
+    const cached = getIdempotentResponse(`ailments:${idempotencyKey}`)
+    if (cached) return c.json(cached.body as object, cached.status as 201)
+  }
 
-  if (!agentId || !category || !title || !description) {
+  const parsed = parseJsonBody(await c.req.text())
+  if (!parsed.ok) {
+    return c.json({ error: 'request body must be valid JSON' }, 400)
+  }
+  const { agentId, category, title, description } = parsed.body
+
+  if (
+    !isNonEmptyString(agentId) ||
+    !isNonEmptyString(category) ||
+    !isNonEmptyString(title) ||
+    !isNonEmptyString(description)
+  ) {
     return c.json(
-      { error: 'agentId, category, title, and description are required' },
+      {
+        error:
+          'agentId, category, title, and description are required strings',
+      },
       400
     )
   }
-  if (!CATEGORIES.includes(category)) {
+  if (!CATEGORIES.includes(category as Category)) {
     return c.json(
       { error: `category must be one of: ${CATEGORIES.join(', ')}` },
       400
     )
   }
 
-  const ailment = createAilment({ agentId, category, title, description })
+  const ailment = createAilment({
+    agentId,
+    category: category as Category,
+    title,
+    description,
+  })
+  if (idempotencyKey) {
+    saveIdempotentResponse(`ailments:${idempotencyKey}`, {
+      status: 201,
+      body: ailment,
+    })
+  }
   return c.json(ailment, 201)
 })
 

@@ -49,6 +49,68 @@ describe('POST /api/ailments', () => {
     expect(res.status).toBe(400)
     expect((await res.json()).error).toBeTruthy()
   })
+
+  it('rejects a non-string field with 400', async () => {
+    const res = await app.request('/api/ailments', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        agentId: 'agent-42',
+        category: 'performance',
+        title: 12345,
+        description: 'Description',
+      }),
+    })
+    expect(res.status).toBe(400)
+    expect((await res.json()).error).toBeTruthy()
+  })
+
+  it('rejects malformed JSON with a distinct 400 error', async () => {
+    const res = await app.request('/api/ailments', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: '{not valid json',
+    })
+    expect(res.status).toBe(400)
+    expect((await res.json()).error).toMatch(/valid json/i)
+  })
+
+  it('replays the original result for a repeated Idempotency-Key', async () => {
+    const payload = {
+      agentId: 'agent-idempotent',
+      category: 'other',
+      title: 'Retried ailment',
+      description: 'Should only be created once.',
+    }
+
+    const first = await app.request('/api/ailments', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Idempotency-Key': 'ailment-retry-1',
+      },
+      body: JSON.stringify(payload),
+    })
+    const firstBody = await first.json()
+
+    const second = await app.request('/api/ailments', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Idempotency-Key': 'ailment-retry-1',
+      },
+      body: JSON.stringify(payload),
+    })
+    const secondBody = await second.json()
+
+    expect(secondBody.id).toBe(firstBody.id)
+
+    const list = await (await app.request('/api/ailments')).json()
+    const matches = list.filter(
+      (a: { agentId: string }) => a.agentId === 'agent-idempotent'
+    )
+    expect(matches.length).toBe(1)
+  })
 })
 
 describe('GET /api/ailments', () => {

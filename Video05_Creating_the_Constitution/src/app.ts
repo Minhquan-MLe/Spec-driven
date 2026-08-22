@@ -1,5 +1,6 @@
 import { serveStatic } from '@hono/node-server/serve-static'
 import { Hono } from 'hono'
+import { escapeHtml } from './html'
 import { layout } from './layout'
 import { ailments } from './routes/ailments'
 import { therapies } from './routes/therapies'
@@ -36,13 +37,14 @@ app.get('/dashboard', (c) => {
   const ailmentRows = listAilments()
     .map(
       (a) =>
-        `<tr><td>${a.id}</td><td>${a.category}</td><td>${a.title}</td><td><mark>${a.status}</mark></td></tr>`
+        `<tr><td>${a.id}</td><td>${escapeHtml(a.category)}</td><td>${escapeHtml(a.title)}</td><td><mark>${escapeHtml(a.status)}</mark></td></tr>`
     )
     .join('')
 
   const therapyRows = listTherapies()
     .map(
-      (t) => `<tr><td>${t.name}</td><td>${t.categories.join(', ')}</td></tr>`
+      (t) =>
+        `<tr><td>${escapeHtml(t.name)}</td><td>${escapeHtml(t.categories.join(', '))}</td></tr>`
     )
     .join('')
 
@@ -50,7 +52,7 @@ app.get('/dashboard', (c) => {
     .map((appt) => {
       const therapy = getTherapy(appt.therapyId)
       const slot = getSlot(appt.slotId)
-      return `<tr><td>${appt.agentId}</td><td>${therapy?.name ?? 'Unknown'}</td><td>${slot?.timeSlot ?? 'Unknown'}</td></tr>`
+      return `<tr><td>${escapeHtml(appt.agentId)}</td><td>${escapeHtml(therapy?.name ?? 'Unknown')}</td><td>${escapeHtml(slot?.timeSlot ?? 'Unknown')}</td></tr>`
     })
     .join('')
 

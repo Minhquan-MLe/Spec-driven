@@ -53,6 +53,24 @@ describe('/dashboard', () => {
     expect(body).toContain('Timeout Tuning Session')
     expect(body).toContain('agent-dashboard')
   })
+
+  it('escapes ailment fields so they cannot break out of the table markup', async () => {
+    await app.request('/api/ailments', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        agentId: 'agent-xss',
+        category: 'other',
+        title: '</td></tr><script>alert(1)</script>',
+        description: 'Attempted injection.',
+      }),
+    })
+
+    const body = await (await app.request('/dashboard')).text()
+
+    expect(body).not.toContain('<script>alert(1)</script>')
+    expect(body).toContain('&lt;script&gt;alert(1)&lt;/script&gt;')
+  })
 })
 
 describe('/styles.css', () => {
