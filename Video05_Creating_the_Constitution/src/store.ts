@@ -81,6 +81,24 @@ export async function getAilment(id: number): Promise<Ailment | undefined> {
   return ailmentsRepo.getAilment(getPool(), id)
 }
 
+export interface AilmentPatch {
+  agentId?: string
+  category?: Category
+  title?: string
+  description?: string
+  status?: 'open' | 'resolved'
+}
+
+export async function updateAilment(id: number, patch: AilmentPatch): Promise<Ailment | undefined> {
+  if (!Number.isInteger(id)) return undefined
+  return ailmentsRepo.updateAilment(getPool(), id, patch)
+}
+
+export async function deleteAilment(id: number): Promise<boolean> {
+  if (!Number.isInteger(id)) return false
+  return ailmentsRepo.deleteAilment(getPool(), id)
+}
+
 export async function listTherapies(): Promise<Therapy[]> {
   return therapiesRepo.listTherapies(getPool())
 }
@@ -122,4 +140,39 @@ export async function createAppointment(input: {
 
 export async function listAppointments(): Promise<Appointment[]> {
   return appointmentsRepo.listAppointments(getPool())
+}
+
+export async function getAppointment(id: number): Promise<Appointment | undefined> {
+  if (!Number.isInteger(id)) return undefined
+  return appointmentsRepo.getAppointment(getPool(), id)
+}
+
+export interface AppointmentPatch {
+  agentId?: string
+  therapyId?: number
+  slotId?: number
+}
+
+export type UpdateAppointmentResult =
+  | { ok: true; appointment: Appointment }
+  | {
+      ok: false
+      reason: 'appointment_not_found' | 'therapy_not_found' | 'slot_not_found' | 'slot_taken'
+    }
+
+export async function updateAppointment(
+  id: number,
+  patch: AppointmentPatch
+): Promise<UpdateAppointmentResult> {
+  if (!Number.isInteger(id)) return { ok: false, reason: 'appointment_not_found' }
+  return appointmentsRepo.updateAppointment(getPool(), id, patch)
+}
+
+export type DeleteAppointmentResult =
+  | { ok: true; appointment: Appointment }
+  | { ok: false; reason: 'appointment_not_found' }
+
+export async function deleteAppointment(id: number): Promise<DeleteAppointmentResult> {
+  if (!Number.isInteger(id)) return { ok: false, reason: 'appointment_not_found' }
+  return appointmentsRepo.deleteAppointment(getPool(), id)
 }

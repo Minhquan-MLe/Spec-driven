@@ -2,9 +2,11 @@ import { Hono } from 'hono'
 import {
   CATEGORIES,
   createAilment,
+  deleteAilment,
   getAilment,
   listAilments,
   therapiesForAilment,
+  updateAilment,
   type Category,
 } from '../store'
 import { getIdempotentResponse, saveIdempotentResponse } from '../idempotency'
@@ -73,4 +75,69 @@ ailments.get('/:id/therapies', async (c) => {
   const therapies = await therapiesForAilment(Number(c.req.param('id')))
   if (!therapies) return c.json({ error: 'ailment not found' }, 404)
   return c.json(therapies)
+})
+
+ailments.patch('/:id', async (c) => {
+  const id = Number(c.req.param('id'))
+
+  const parsed = parseJsonBody(await c.req.text())
+  if (!parsed.ok) {
+    return c.json({ error: 'request body must be valid JSON' }, 400)
+  }
+  const { agentId, category, title, description, status } = parsed.body
+
+  if (
+    agentId === undefined &&
+    category === undefined &&
+    title === undefined &&
+    description === undefined &&
+    status === undefined
+  ) {
+    return c.json(
+      {
+        error:
+          'at least one of agentId, category, title, description, status is required',
+      },
+      400
+    )
+  }
+
+  if (agentId !== undefined && !isNonEmptyString(agentId)) {
+    return c.json({ error: 'agentId must be a non-empty string' }, 400)
+  }
+  if (title !== undefined && !isNonEmptyString(title)) {
+    return c.json({ error: 'title must be a non-empty string' }, 400)
+  }
+  if (description !== undefined && !isNonEmptyString(description)) {
+    return c.json({ error: 'description must be a non-empty string' }, 400)
+  }
+  if (
+    category !== undefined &&
+    (!isNonEmptyString(category) || !CATEGORIES.includes(category as Category))
+  ) {
+    return c.json(
+      { error: `category must be one of: ${CATEGORIES.join(', ')}` },
+      400
+    )
+  }
+  if (status !== undefined && status !== 'open' && status !== 'resolved') {
+    return c.json({ error: "status must be 'open' or 'resolved'" }, 400)
+  }
+
+  const updated = await updateAilment(id, {
+    agentId: agentId as string | undefined,
+    category: category as Category | undefined,
+    title: title as string | undefined,
+    description: description as string | undefined,
+    status: status as 'open' | 'resolved' | undefined,
+  })
+
+  if (!updated) return c.json({ error: 'ailment not found' }, 404)
+  return c.json(updated)
+})
+
+ailments.delete('/:id', async (c) => {
+  const deleted = await deleteAilment(Number(c.req.param('id')))
+  if (!deleted) return c.json({ error: 'ailment not found' }, 404)
+  return c.body(null, 204)
 })

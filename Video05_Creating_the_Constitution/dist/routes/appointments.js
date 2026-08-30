@@ -50,3 +50,57 @@ exports.appointments.post('/', (c) => __awaiter(void 0, void 0, void 0, function
     return c.json(result.appointment, 201);
 }));
 exports.appointments.get('/', (c) => __awaiter(void 0, void 0, void 0, function* () { return c.json(yield (0, store_1.listAppointments)()); }));
+exports.appointments.get('/:id', (c) => __awaiter(void 0, void 0, void 0, function* () {
+    const appointment = yield (0, store_1.getAppointment)(Number(c.req.param('id')));
+    if (!appointment)
+        return c.json({ error: 'appointment not found' }, 404);
+    return c.json(appointment);
+}));
+exports.appointments.patch('/:id', (c) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = Number(c.req.param('id'));
+    const parsed = (0, validation_1.parseJsonBody)(yield c.req.text());
+    if (!parsed.ok) {
+        return c.json({ error: 'request body must be valid JSON' }, 400);
+    }
+    const { agentId, therapyId: rawTherapyId, slotId: rawSlotId } = parsed.body;
+    if (agentId === undefined && rawTherapyId === undefined && rawSlotId === undefined) {
+        return c.json({ error: 'at least one of agentId, therapyId, slotId is required' }, 400);
+    }
+    if (agentId !== undefined && !(0, validation_1.isNonEmptyString)(agentId)) {
+        return c.json({ error: 'agentId must be a non-empty string' }, 400);
+    }
+    let therapyId;
+    if (rawTherapyId !== undefined) {
+        const parsedTherapyId = (0, validation_1.parsePositiveInt)(rawTherapyId);
+        if (parsedTherapyId === null) {
+            return c.json({ error: 'therapyId must be a positive integer' }, 400);
+        }
+        therapyId = parsedTherapyId;
+    }
+    let slotId;
+    if (rawSlotId !== undefined) {
+        const parsedSlotId = (0, validation_1.parsePositiveInt)(rawSlotId);
+        if (parsedSlotId === null) {
+            return c.json({ error: 'slotId must be a positive integer' }, 400);
+        }
+        slotId = parsedSlotId;
+    }
+    const result = yield (0, store_1.updateAppointment)(id, {
+        agentId: agentId,
+        therapyId,
+        slotId,
+    });
+    if (!result.ok) {
+        if (result.reason === 'slot_taken') {
+            return c.json({ error: 'slot already taken' }, 409);
+        }
+        return c.json({ error: result.reason.replace(/_/g, ' ') }, 404);
+    }
+    return c.json(result.appointment);
+}));
+exports.appointments.delete('/:id', (c) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield (0, store_1.deleteAppointment)(Number(c.req.param('id')));
+    if (!result.ok)
+        return c.json({ error: 'appointment not found' }, 404);
+    return c.body(null, 204);
+}));

@@ -46,6 +46,8 @@ exports.CATEGORIES = void 0;
 exports.createAilment = createAilment;
 exports.listAilments = listAilments;
 exports.getAilment = getAilment;
+exports.updateAilment = updateAilment;
+exports.deleteAilment = deleteAilment;
 exports.listTherapies = listTherapies;
 exports.getTherapy = getTherapy;
 exports.therapiesForAilment = therapiesForAilment;
@@ -53,6 +55,9 @@ exports.listAvailableSlots = listAvailableSlots;
 exports.getSlot = getSlot;
 exports.createAppointment = createAppointment;
 exports.listAppointments = listAppointments;
+exports.getAppointment = getAppointment;
+exports.updateAppointment = updateAppointment;
+exports.deleteAppointment = deleteAppointment;
 const db_1 = require("./db");
 const ailmentsRepo = __importStar(require("./db/repository/ailments"));
 const appointmentsRepo = __importStar(require("./db/repository/appointments"));
@@ -99,6 +104,20 @@ function getAilment(id) {
         return ailmentsRepo.getAilment((0, db_1.getPool)(), id);
     });
 }
+function updateAilment(id, patch) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (!Number.isInteger(id))
+            return undefined;
+        return ailmentsRepo.updateAilment((0, db_1.getPool)(), id, patch);
+    });
+}
+function deleteAilment(id) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (!Number.isInteger(id))
+            return false;
+        return ailmentsRepo.deleteAilment((0, db_1.getPool)(), id);
+    });
+}
 function listTherapies() {
     return __awaiter(this, void 0, void 0, function* () {
         return therapiesRepo.listTherapies((0, db_1.getPool)());
@@ -142,5 +161,26 @@ function createAppointment(input) {
 function listAppointments() {
     return __awaiter(this, void 0, void 0, function* () {
         return appointmentsRepo.listAppointments((0, db_1.getPool)());
+    });
+}
+function getAppointment(id) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (!Number.isInteger(id))
+            return undefined;
+        return appointmentsRepo.getAppointment((0, db_1.getPool)(), id);
+    });
+}
+function updateAppointment(id, patch) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (!Number.isInteger(id))
+            return { ok: false, reason: 'appointment_not_found' };
+        return appointmentsRepo.updateAppointment((0, db_1.getPool)(), id, patch);
+    });
+}
+function deleteAppointment(id) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (!Number.isInteger(id))
+            return { ok: false, reason: 'appointment_not_found' };
+        return appointmentsRepo.deleteAppointment((0, db_1.getPool)(), id);
     });
 }
