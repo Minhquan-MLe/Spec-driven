@@ -19,6 +19,7 @@ const ailmentsUi_1 = require("./routes/ailmentsUi");
 const therapies_1 = require("./routes/therapies");
 const slots_1 = require("./routes/slots");
 const appointments_1 = require("./routes/appointments");
+const appointmentsUi_1 = require("./routes/appointmentsUi");
 const store_1 = require("./store");
 exports.app = new hono_1.Hono();
 // Postgres queries can fail (connection dropped, constraint violation,
@@ -37,6 +38,7 @@ exports.app.route('/api/therapies', therapies_1.therapies);
 exports.app.route('/api/slots', slots_1.slots);
 exports.app.route('/api/appointments', appointments_1.appointments);
 exports.app.route('/ailments', ailmentsUi_1.ailmentsUi);
+exports.app.route('/appointments', appointmentsUi_1.appointmentsUi);
 exports.app.get('/', (c) => {
     const content = `
     <h1>AgentClinic</h1>
@@ -75,7 +77,17 @@ exports.app.get('/dashboard', (c) => __awaiter(void 0, void 0, void 0, function*
             (0, store_1.getTherapy)(appt.therapyId),
             (0, store_1.getSlot)(appt.slotId),
         ]);
-        return `<tr><td>${(0, html_1.escapeHtml)(appt.agentId)}</td><td>${(0, html_1.escapeHtml)((_a = therapy === null || therapy === void 0 ? void 0 : therapy.name) !== null && _a !== void 0 ? _a : 'Unknown')}</td><td>${(0, html_1.escapeHtml)((_b = slot === null || slot === void 0 ? void 0 : slot.timeSlot) !== null && _b !== void 0 ? _b : 'Unknown')}</td></tr>`;
+        return `<tr>
+          <td>${(0, html_1.escapeHtml)(appt.agentId)}</td>
+          <td>${(0, html_1.escapeHtml)((_a = therapy === null || therapy === void 0 ? void 0 : therapy.name) !== null && _a !== void 0 ? _a : 'Unknown')}</td>
+          <td>${(0, html_1.escapeHtml)((_b = slot === null || slot === void 0 ? void 0 : slot.timeSlot) !== null && _b !== void 0 ? _b : 'Unknown')}</td>
+          <td class="actions">
+            <a href="/appointments/${appt.id}/edit" role="button" class="secondary">Edit</a>
+            <form method="POST" action="/appointments/${appt.id}/delete" onsubmit="return confirm('Delete this appointment?')">
+              <button type="submit" class="contrast">Delete</button>
+            </form>
+          </td>
+        </tr>`;
     })))).join('');
     const content = `
     <h1>Dashboard</h1>
@@ -103,10 +115,11 @@ exports.app.get('/dashboard', (c) => __awaiter(void 0, void 0, void 0, function*
 
     <section>
       <h2>Appointments</h2>
+      <p><a href="/appointments/new" role="button">New Appointment</a></p>
       <div class="table-responsive">
         <table>
-          <thead><tr><th>Agent</th><th>Therapy</th><th>Time</th></tr></thead>
-          <tbody>${appointmentRows || '<tr><td colspan="3">No appointments booked yet.</td></tr>'}</tbody>
+          <thead><tr><th>Agent</th><th>Therapy</th><th>Time</th><th>Actions</th></tr></thead>
+          <tbody>${appointmentRows || '<tr><td colspan="4">No appointments booked yet.</td></tr>'}</tbody>
         </table>
       </div>
     </section>

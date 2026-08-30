@@ -7,6 +7,7 @@ import { ailmentsUi } from './routes/ailmentsUi'
 import { therapies } from './routes/therapies'
 import { slots } from './routes/slots'
 import { appointments } from './routes/appointments'
+import { appointmentsUi } from './routes/appointmentsUi'
 import {
   getSlot,
   getTherapy,
@@ -35,6 +36,7 @@ app.route('/api/therapies', therapies)
 app.route('/api/slots', slots)
 app.route('/api/appointments', appointments)
 app.route('/ailments', ailmentsUi)
+app.route('/appointments', appointmentsUi)
 
 app.get('/', (c) => {
   const content = `
@@ -85,7 +87,17 @@ app.get('/dashboard', async (c) => {
           getTherapy(appt.therapyId),
           getSlot(appt.slotId),
         ])
-        return `<tr><td>${escapeHtml(appt.agentId)}</td><td>${escapeHtml(therapy?.name ?? 'Unknown')}</td><td>${escapeHtml(slot?.timeSlot ?? 'Unknown')}</td></tr>`
+        return `<tr>
+          <td>${escapeHtml(appt.agentId)}</td>
+          <td>${escapeHtml(therapy?.name ?? 'Unknown')}</td>
+          <td>${escapeHtml(slot?.timeSlot ?? 'Unknown')}</td>
+          <td class="actions">
+            <a href="/appointments/${appt.id}/edit" role="button" class="secondary">Edit</a>
+            <form method="POST" action="/appointments/${appt.id}/delete" onsubmit="return confirm('Delete this appointment?')">
+              <button type="submit" class="contrast">Delete</button>
+            </form>
+          </td>
+        </tr>`
       })
     )
   ).join('')
@@ -116,10 +128,11 @@ app.get('/dashboard', async (c) => {
 
     <section>
       <h2>Appointments</h2>
+      <p><a href="/appointments/new" role="button">New Appointment</a></p>
       <div class="table-responsive">
         <table>
-          <thead><tr><th>Agent</th><th>Therapy</th><th>Time</th></tr></thead>
-          <tbody>${appointmentRows || '<tr><td colspan="3">No appointments booked yet.</td></tr>'}</tbody>
+          <thead><tr><th>Agent</th><th>Therapy</th><th>Time</th><th>Actions</th></tr></thead>
+          <tbody>${appointmentRows || '<tr><td colspan="4">No appointments booked yet.</td></tr>'}</tbody>
         </table>
       </div>
     </section>
