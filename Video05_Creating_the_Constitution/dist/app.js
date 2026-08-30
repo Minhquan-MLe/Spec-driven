@@ -15,6 +15,7 @@ const hono_1 = require("hono");
 const html_1 = require("./html");
 const layout_1 = require("./layout");
 const ailments_1 = require("./routes/ailments");
+const ailmentsUi_1 = require("./routes/ailmentsUi");
 const therapies_1 = require("./routes/therapies");
 const slots_1 = require("./routes/slots");
 const appointments_1 = require("./routes/appointments");
@@ -35,6 +36,7 @@ exports.app.route('/api/ailments', ailments_1.ailments);
 exports.app.route('/api/therapies', therapies_1.therapies);
 exports.app.route('/api/slots', slots_1.slots);
 exports.app.route('/api/appointments', appointments_1.appointments);
+exports.app.route('/ailments', ailmentsUi_1.ailmentsUi);
 exports.app.get('/', (c) => {
     const content = `
     <h1>AgentClinic</h1>
@@ -51,7 +53,18 @@ exports.app.get('/dashboard', (c) => __awaiter(void 0, void 0, void 0, function*
         (0, store_1.listAppointments)(),
     ]);
     const ailmentRows = ailmentList
-        .map((a) => `<tr><td>${a.id}</td><td>${(0, html_1.escapeHtml)(a.category)}</td><td>${(0, html_1.escapeHtml)(a.title)}</td><td><mark>${(0, html_1.escapeHtml)(a.status)}</mark></td></tr>`)
+        .map((a) => `<tr>
+          <td>${a.id}</td>
+          <td>${(0, html_1.escapeHtml)(a.category)}</td>
+          <td>${(0, html_1.escapeHtml)(a.title)}</td>
+          <td><mark>${(0, html_1.escapeHtml)(a.status)}</mark></td>
+          <td class="actions">
+            <a href="/ailments/${a.id}/edit" role="button" class="secondary">Edit</a>
+            <form method="POST" action="/ailments/${a.id}/delete" onsubmit="return confirm('Delete this ailment?')">
+              <button type="submit" class="contrast">Delete</button>
+            </form>
+          </td>
+        </tr>`)
         .join('');
     const therapyRows = therapyList
         .map((t) => `<tr><td>${(0, html_1.escapeHtml)(t.name)}</td><td>${(0, html_1.escapeHtml)(t.categories.join(', '))}</td></tr>`)
@@ -69,10 +82,11 @@ exports.app.get('/dashboard', (c) => __awaiter(void 0, void 0, void 0, function*
 
     <section>
       <h2>Ailments</h2>
+      <p><a href="/ailments/new" role="button">New Ailment</a></p>
       <div class="table-responsive">
         <table>
-          <thead><tr><th>ID</th><th>Category</th><th>Title</th><th>Status</th></tr></thead>
-          <tbody>${ailmentRows || '<tr><td colspan="4">No ailments reported yet.</td></tr>'}</tbody>
+          <thead><tr><th>ID</th><th>Category</th><th>Title</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody>${ailmentRows || '<tr><td colspan="5">No ailments reported yet.</td></tr>'}</tbody>
         </table>
       </div>
     </section>

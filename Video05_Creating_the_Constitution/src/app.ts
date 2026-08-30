@@ -3,6 +3,7 @@ import { Hono } from 'hono'
 import { escapeHtml } from './html'
 import { layout } from './layout'
 import { ailments } from './routes/ailments'
+import { ailmentsUi } from './routes/ailmentsUi'
 import { therapies } from './routes/therapies'
 import { slots } from './routes/slots'
 import { appointments } from './routes/appointments'
@@ -33,6 +34,7 @@ app.route('/api/ailments', ailments)
 app.route('/api/therapies', therapies)
 app.route('/api/slots', slots)
 app.route('/api/appointments', appointments)
+app.route('/ailments', ailmentsUi)
 
 app.get('/', (c) => {
   const content = `
@@ -54,7 +56,18 @@ app.get('/dashboard', async (c) => {
   const ailmentRows = ailmentList
     .map(
       (a) =>
-        `<tr><td>${a.id}</td><td>${escapeHtml(a.category)}</td><td>${escapeHtml(a.title)}</td><td><mark>${escapeHtml(a.status)}</mark></td></tr>`
+        `<tr>
+          <td>${a.id}</td>
+          <td>${escapeHtml(a.category)}</td>
+          <td>${escapeHtml(a.title)}</td>
+          <td><mark>${escapeHtml(a.status)}</mark></td>
+          <td class="actions">
+            <a href="/ailments/${a.id}/edit" role="button" class="secondary">Edit</a>
+            <form method="POST" action="/ailments/${a.id}/delete" onsubmit="return confirm('Delete this ailment?')">
+              <button type="submit" class="contrast">Delete</button>
+            </form>
+          </td>
+        </tr>`
     )
     .join('')
 
@@ -82,10 +95,11 @@ app.get('/dashboard', async (c) => {
 
     <section>
       <h2>Ailments</h2>
+      <p><a href="/ailments/new" role="button">New Ailment</a></p>
       <div class="table-responsive">
         <table>
-          <thead><tr><th>ID</th><th>Category</th><th>Title</th><th>Status</th></tr></thead>
-          <tbody>${ailmentRows || '<tr><td colspan="4">No ailments reported yet.</td></tr>'}</tbody>
+          <thead><tr><th>ID</th><th>Category</th><th>Title</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody>${ailmentRows || '<tr><td colspan="5">No ailments reported yet.</td></tr>'}</tbody>
         </table>
       </div>
     </section>
