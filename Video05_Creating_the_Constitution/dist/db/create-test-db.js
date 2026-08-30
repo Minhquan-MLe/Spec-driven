@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 require("dotenv/config");
 const pg_1 = require("pg");
+const index_1 = require("./index");
 // Creates the agentclinic_test database on the SAME Postgres server/
 // container as the dev database (DATABASE_URL), if it doesn't already
 // exist. Never touches the dev database's data — it only reads/writes
@@ -29,14 +30,8 @@ function testDatabaseName(url) {
 }
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
-        const adminConnectionString = process.env.DATABASE_URL;
-        const testConnectionString = process.env.TEST_DATABASE_URL;
-        if (!adminConnectionString) {
-            throw new Error('DATABASE_URL is not set. Copy .env.example to .env and fill in real values, then re-run this command.');
-        }
-        if (!testConnectionString) {
-            throw new Error('TEST_DATABASE_URL is not set. Copy .env.example to .env and fill in real values, then re-run this command.');
-        }
+        const adminConnectionString = (0, index_1.getConnectionString)('development');
+        const testConnectionString = (0, index_1.getConnectionString)('test');
         const testDbName = testDatabaseName(testConnectionString);
         // Connecting via DATABASE_URL (the dev database) is enough — you
         // don't need to already be connected to the database you're about to

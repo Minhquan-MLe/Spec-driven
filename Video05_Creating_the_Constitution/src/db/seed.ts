@@ -1,5 +1,6 @@
 import 'dotenv/config'
 import { Client } from 'pg'
+import { getConnectionString } from './index'
 
 // Same fixed data src/store.ts currently seeds in memory — kept here so
 // a fresh database starts with the same therapies and future slots the
@@ -63,14 +64,7 @@ function futureSlotTimestamps(count: number): Date[] {
 }
 
 async function main(): Promise<void> {
-  const connectionString = process.env.DATABASE_URL
-  if (!connectionString) {
-    throw new Error(
-      'DATABASE_URL is not set. Copy .env.example to .env and fill in real values, then re-run this command.'
-    )
-  }
-
-  const client = new Client({ connectionString })
+  const client = new Client({ connectionString: getConnectionString('development') })
   await client.connect()
 
   try {

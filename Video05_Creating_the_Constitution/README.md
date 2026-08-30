@@ -47,6 +47,17 @@ another Docker Compose-compatible tool) installed and running.
 
    You should see the `postgres` service listed as `running (healthy)`.
 
+   Then confirm the app can actually connect (not just that the
+   container is up):
+
+   ```
+   npm run db:check
+   ```
+
+   You should see `OK: connected to the "development" database ...`. If
+   `.env` is missing or `DATABASE_URL` is unset, this fails fast with a
+   clear message instead of hanging or crashing.
+
 4. **Create the database tables** (run once, and again any time a new
    migration file is added):
 
@@ -82,6 +93,14 @@ container. Set it up once:
    ```
    npm run db:test:migrate
    ```
+
+3. **Confirm the app can connect to it too:**
+
+   ```
+   npm run db:test:check
+   ```
+
+   You should see `OK: connected to the "test" database ...`.
 
 This never touches the `agentclinic` (dev) database or its data — it
 only adds a second, empty database alongside it on the same server.

@@ -2,20 +2,18 @@ import 'dotenv/config'
 import { readFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
 import { Client } from 'pg'
+import { getConnectionString } from './index'
 
 // Run from the project root (that's how the db:migrate npm script
 // invokes it), so migrations live at src/db/migrations relative to cwd.
 const MIGRATIONS_DIR = join(process.cwd(), 'src', 'db', 'migrations')
 
 async function main(): Promise<void> {
-  const connectionString = process.env.DATABASE_URL
-  if (!connectionString) {
-    throw new Error(
-      'DATABASE_URL is not set. Copy .env.example to .env and fill in real values, then re-run this command.'
-    )
-  }
-
-  const client = new Client({ connectionString })
+  // A single Client (not the shared Pool) is the right tool here — this
+  // script runs its statements sequentially on one connection and never
+  // needs concurrent queries. Only the connection string itself comes
+  // from the shared module, so dev/test targeting stays centralized.
+  const client = new Client({ connectionString: getConnectionString('development') })
   await client.connect()
 
   try {

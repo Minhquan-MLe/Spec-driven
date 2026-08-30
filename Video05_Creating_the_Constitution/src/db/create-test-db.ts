@@ -1,5 +1,6 @@
 import 'dotenv/config'
 import { Client } from 'pg'
+import { getConnectionString } from './index'
 
 // Creates the agentclinic_test database on the SAME Postgres server/
 // container as the dev database (DATABASE_URL), if it doesn't already
@@ -23,18 +24,8 @@ function testDatabaseName(url: string): string {
 }
 
 async function main(): Promise<void> {
-  const adminConnectionString = process.env.DATABASE_URL
-  const testConnectionString = process.env.TEST_DATABASE_URL
-  if (!adminConnectionString) {
-    throw new Error(
-      'DATABASE_URL is not set. Copy .env.example to .env and fill in real values, then re-run this command.'
-    )
-  }
-  if (!testConnectionString) {
-    throw new Error(
-      'TEST_DATABASE_URL is not set. Copy .env.example to .env and fill in real values, then re-run this command.'
-    )
-  }
+  const adminConnectionString = getConnectionString('development')
+  const testConnectionString = getConnectionString('test')
 
   const testDbName = testDatabaseName(testConnectionString)
 

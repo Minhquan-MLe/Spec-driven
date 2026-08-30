@@ -1,6 +1,7 @@
 import 'dotenv/config'
 import { spawnSync } from 'node:child_process'
 import { join } from 'node:path'
+import { getConnectionString } from './index'
 
 // Runs the exact same migration logic as `npm run db:migrate`, but
 // against TEST_DATABASE_URL instead of DATABASE_URL. migrate.ts itself
@@ -8,11 +9,11 @@ import { join } from 'node:path'
 // overrides that env var for a child process, so dev and test
 // migrations can never accidentally point at the wrong database.
 
-const testConnectionString = process.env.TEST_DATABASE_URL
-if (!testConnectionString) {
-  console.error(
-    'TEST_DATABASE_URL is not set. Copy .env.example to .env and fill in real values, then re-run this command.'
-  )
+let testConnectionString: string
+try {
+  testConnectionString = getConnectionString('test')
+} catch (err) {
+  console.error((err as Error).message)
   process.exit(1)
 }
 

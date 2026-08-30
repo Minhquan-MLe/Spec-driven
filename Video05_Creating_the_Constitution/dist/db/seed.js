@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 require("dotenv/config");
 const pg_1 = require("pg");
+const index_1 = require("./index");
 const THERAPIES = [
     {
         name: 'Timeout Tuning Session',
@@ -57,11 +58,7 @@ function futureSlotTimestamps(count) {
 }
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
-        const connectionString = process.env.DATABASE_URL;
-        if (!connectionString) {
-            throw new Error('DATABASE_URL is not set. Copy .env.example to .env and fill in real values, then re-run this command.');
-        }
-        const client = new pg_1.Client({ connectionString });
+        const client = new pg_1.Client({ connectionString: (0, index_1.getConnectionString)('development') });
         yield client.connect();
         try {
             for (const therapy of THERAPIES) {

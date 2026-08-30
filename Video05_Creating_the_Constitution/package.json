@@ -11,7 +11,9 @@
     "db:seed": "tsc && node dist/db/seed.js",
     "db:setup": "npm run db:migrate && npm run db:seed",
     "db:test:create": "tsc && node dist/db/create-test-db.js",
-    "db:test:migrate": "tsc && node dist/db/migrate-test.js"
+    "db:test:migrate": "tsc && node dist/db/migrate-test.js",
+    "db:check": "tsc && node dist/db/check-connection.js",
+    "db:test:check": "tsc && node dist/db/check-connection.js test"
   },
   "dependencies": {
     "@hono/node-server": "  ^2.1.1",
