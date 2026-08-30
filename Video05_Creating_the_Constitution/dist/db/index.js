@@ -34,9 +34,38 @@ function getConnectionString(target = 'development') {
     }
     return connectionString;
 }
+/**
+ * Attaches the pool's one and only `error` listener. `pg.Pool` emits
+ * `error` when an *idle* client (not in the middle of a query) is
+ * disconnected in the background — e.g. Postgres terminating the
+ * connection on `docker compose stop`/`restart`. Node's EventEmitter
+ * crashes the process on an `error` event with no listener, so without
+ * this, a Postgres restart can kill the whole running app even though
+ * no request was in flight.
+ *
+ * This does NOT affect normal query error handling: a query made while
+ * Postgres is unavailable still rejects its own promise and propagates
+ * through the usual route → app.onError path to the existing generic
+ * 500 response, exactly as before. This only stops a *background*
+ * connection loss from crashing the process outright. It also adds no
+ * retry logic — `pg.Pool` already opens a fresh connection on the next
+ * query once Postgres is reachable again; nothing here needs to drive
+ * that.
+ *
+ * Logs only `err.message` — never the error object itself (which can
+ * carry a `client` property with connection details) — so no
+ * connection string, password, or SQL ever reaches the log.
+ */
+function attachPoolErrorHandler(pool) {
+    pool.on('error', (err) => {
+        console.error(`[db] pool error (idle connection lost): ${err.message}`);
+    });
+}
 /** Creates a new connection pool for the given target. */
 function createPool(target = 'development', config = {}) {
-    return new pg_1.Pool(Object.assign({ connectionString: getConnectionString(target) }, config));
+    const pool = new pg_1.Pool(Object.assign({ connectionString: getConnectionString(target) }, config));
+    attachPoolErrorHandler(pool);
+    return pool;
 }
 let sharedPool;
 /**
