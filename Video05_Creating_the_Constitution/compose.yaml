@@ -1,0 +1,36 @@
+# Local development database only.
+#
+# This file starts a single PostgreSQL container for AgentClinic to use
+# while developing on your machine. It does NOT run the Node/Hono app —
+# keep running that with `npm start`, same as before.
+#
+# Usage:
+#   docker compose up -d      # start Postgres in the background
+#   docker compose ps         # check it's running and healthy
+#   docker compose down       # stop it (keeps your data)
+#   docker compose down -v    # stop it AND delete all data (careful!)
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      # Host port is configurable via POSTGRES_PORT (.env) in case 5432
+      # is already used by another Postgres install on your machine.
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      # Named volume so data survives `docker compose down` / restarts.
+      # Only `docker compose down -v` removes it.
+      - agentclinic_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  agentclinic_postgres_data:

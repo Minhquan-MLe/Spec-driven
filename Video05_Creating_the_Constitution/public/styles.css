@@ -32,6 +32,25 @@
   overflow-x: auto;
 }
 
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.actions form {
+  margin: 0;
+}
+
+.form-error {
+  color: #9a1c1c;
+  background: rgba(154, 28, 28, 0.08);
+  border: 1px solid #9a1c1c;
+  border-radius: 0.25rem;
+  padding: 0.75rem 1rem;
+}
+
 .site-footer {
   max-width: 640px;
   margin: 2rem auto 1rem;

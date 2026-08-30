@@ -1,5 +1,16 @@
-import { describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+// Uses the in-memory manual mock at src/__mocks__/store.ts instead of
+// the real ../store (which talks to PostgreSQL) — keeps this suite
+// independent of a live database.
+vi.mock('../store')
+
 import { app } from '../app'
+import { resetMockStore } from '../store'
+
+beforeEach(() => {
+  resetMockStore()
+})
 
 describe('GET /api/slots', () => {
   it('lists only available (untaken) slots', async () => {

@@ -14,3 +14,14 @@ export function getIdempotentResponse(key: string): CachedResponse | undefined {
 export function saveIdempotentResponse(key: string, response: CachedResponse): void {
   responses.set(key, response)
 }
+
+/**
+ * Test-only: clears every cached idempotent response. Never called by
+ * request-handling code — request behavior (getIdempotentResponse /
+ * saveIdempotentResponse) is unchanged. Exists so test files can start
+ * each test with an empty cache instead of one a previous test's
+ * Idempotency-Key requests may have populated.
+ */
+export function resetIdempotencyCache(): void {
+  responses.clear()
+}

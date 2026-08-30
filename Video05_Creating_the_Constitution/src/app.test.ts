@@ -1,5 +1,21 @@
-import { describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+// Uses the in-memory manual mock at src/__mocks__/store.ts instead of
+// the real ./store (which talks to PostgreSQL) — keeps this suite
+// independent of a live database.
+vi.mock('./store')
+
 import { app } from './app'
+import { resetIdempotencyCache } from './idempotency'
+import { resetMockStore } from './store'
+
+// The mock module (and the real idempotency cache, which isn't mocked)
+// are shared across every test in this file — reset both before each
+// test so none can observe data or cached responses left by another.
+beforeEach(() => {
+  resetMockStore()
+  resetIdempotencyCache()
+})
 
 describe('/', () => {
   it('renders the AgentClinic home page with a link to /dashboard', async () => {

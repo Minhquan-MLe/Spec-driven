@@ -3,4 +3,4 @@ import { listAvailableSlots } from '../store'
 
 export const slots = new Hono()
 
-slots.get('/', (c) => c.json(listAvailableSlots()))
+slots.get('/', async (c) => c.json(await listAvailableSlots()))
