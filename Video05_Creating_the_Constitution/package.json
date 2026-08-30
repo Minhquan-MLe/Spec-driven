@@ -13,7 +13,8 @@
     "db:test:create": "tsc && node dist/db/create-test-db.js",
     "db:test:migrate": "tsc && node dist/db/migrate-test.js",
     "db:check": "tsc && node dist/db/check-connection.js",
-    "db:test:check": "tsc && node dist/db/check-connection.js test"
+    "db:test:check": "tsc && node dist/db/check-connection.js test",
+    "test:db": "vitest run --config vitest.db.config.ts"
   },
   "dependencies": {
     "@hono/node-server": "  ^2.1.1",

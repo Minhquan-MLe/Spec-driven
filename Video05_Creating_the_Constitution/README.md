@@ -105,6 +105,27 @@ container. Set it up once:
 This never touches the `agentclinic` (dev) database or its data — it
 only adds a second, empty database alongside it on the same server.
 
+### Repository database tests
+
+`src/db/repository/` has a small set of functions that read/write
+Postgres directly (used by a later phase, not yet by the running app).
+Its integration tests connect to the **test** database and reset a few
+tables between tests, so they run separately from the normal suite:
+
+```
+npm run test:db
+```
+
+This is different from plain `npm test` in two ways: it requires the
+test database to exist and be migrated (steps above), and it truncates
+the `ailments`/`therapies`/`slots`/`appointments` tables in
+`agentclinic_test` between tests. Every test-table reset first checks
+`SELECT current_database()` and refuses to run if it isn't connected to
+the exact database named by `TEST_DATABASE_URL` — so even a badly
+misconfigured `.env` can't cause this command to touch `agentclinic`'s
+data. Plain `npm test` never loads these tests and never needs a
+database at all.
+
 To stop the database later (keeping all its data):
 
 ```
