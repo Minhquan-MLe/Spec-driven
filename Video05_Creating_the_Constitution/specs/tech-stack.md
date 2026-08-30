@@ -58,13 +58,32 @@
   (see `README.md` for exact commands).
 - Plain **`pg`** (node-postgres) for database access — no ORM, per the
   "keep dependencies minimal" principle above.
-- **Transitional state:** the database and its schema exist and are
-  fully runnable, but the application itself (`src/store.ts` and the
-  routes/dashboard that use it) still reads/writes an in-memory store.
-  Wiring the app to Postgres is a later phase in
-  `specs/2026-08-30-postgres-crud-ui/plan.md` — until then, restarting
-  the Node process still resets ailment/appointment data even though
-  the database itself persists.
+- **Live, not transitional:** `src/store.ts` has no in-memory arrays —
+  every ailment/therapy/slot/appointment read and write goes through
+  `src/db/repository/` to Postgres via a shared `pg.Pool`
+  (`src/db/index.ts`). Restarting the Node process no longer resets any
+  data; only the small `Idempotency-Key` replay cache
+  (`src/idempotency.ts`) is still intentionally in memory. Automated
+  tests still run against an in-memory manual mock
+  (`src/__mocks__/store.ts`) so `npm test` needs no database; a
+  separate `npm run test:db` exercises the real repository layer
+  against a dedicated `agentclinic_test` database.
+- **Reliability:** the shared `pg.Pool` (`createPool()` in
+  `src/db/index.ts`) attaches one `error` listener to every pool it
+  creates. `pg.Pool` emits `error` when an *idle* client is
+  disconnected in the background — e.g. Postgres terminating the
+  connection on `docker compose stop`/`restart` — and Node's default
+  behavior for an unlistened `error` event is to crash the process;
+  the listener logs a concise, safe message (`err.message` only —
+  never the connection string, password, or full error object) instead
+  of letting that happen. This doesn't touch normal query error
+  handling: a request made while Postgres is unavailable still fails
+  and still returns the existing generic `500` response. No retry loop
+  was added — `pg.Pool` already opens a fresh connection lazily on the
+  next query, so once Postgres is reachable again the same running
+  process serves database requests normally with no manual restart.
+  Verified live: `specs/2026-08-30-postgres-crud-ui/validation.md`'s
+  "Hotfix validation" section.
 
 ## Non-goals (for now)
 

@@ -16,7 +16,51 @@ npm run build
 npm start
 ```
 
-The app is then available at http://localhost:3000. If Postgres isn't running or `.env`/`DATABASE_URL` is missing, requests will fail with a clear error (logged server-side) rather than silently falling back to any in-memory data — there is no in-memory fallback.
+The app is then available at http://localhost:3000. If Postgres isn't running or `.env`/`DATABASE_URL` is missing, requests will fail with a clear error (logged server-side) rather than silently falling back to any in-memory data — there is no in-memory fallback. `DATABASE_URL` is only read the first time a request actually needs the database, not at startup, so the app itself will still start and serve non-database routes even without it configured.
+
+If Postgres is stopped or restarted while the app is already running (e.g. `docker compose stop`), the app keeps running — it logs a short message server-side and continues serving other requests; any request needing the database in that window gets the same generic `500` response as any other failure. Once Postgres is back up, the same running process reconnects automatically on the next database request — no restart needed.
+
+## Using the app
+
+- **`/`** — a short landing page linking to the dashboard.
+- **`/dashboard`** — lists Ailments, Therapies, Slots, and Appointments.
+  Therapies and Slots are seeded, read-only reference data. Ailments and
+  Appointments each have "New", "Edit", and "Delete" controls right on
+  the dashboard:
+  - **New Ailment** (`/ailments/new`) / **New Appointment**
+    (`/appointments/new`) — plain HTML forms; submitting them creates
+    the record and returns you to the dashboard. Invalid input
+    re-displays the same form with your entries kept and a clear error
+    message instead of losing your work.
+  - **Edit** (`/ailments/:id/edit`, `/appointments/:id/edit`) — pre-filled
+    with the record's current values. Editing an appointment's slot
+    shows its own (currently booked) slot as a selectable option
+    alongside every other available one.
+  - **Delete** — a one-click button per row that asks you to confirm
+    before submitting; there's no way to delete by just visiting a URL
+    (it's a `POST`, not a `GET`).
+- The JSON API under `/api/*` (`/api/ailments`, `/api/appointments`,
+  `/api/therapies`, `/api/slots`) is unchanged by any of the above and
+  can be used independently — see `specs/2026-08-30-postgres-crud-ui/requirements.md`
+  for its exact routes, request/response shapes, and status codes.
+
+## Running tests
+
+```
+npm test
+```
+
+Runs the full non-database suite (route/UI/component tests) against an
+in-memory mock of the store — no Postgres connection needed at all; it
+works even with the database stopped.
+
+```
+npm run test:db
+```
+
+Runs the repository integration tests against the real **test**
+database (`agentclinic_test`) — see "Test database" and "Repository
+database tests" below for one-time setup.
 
 ## Database (PostgreSQL, local dev)
 

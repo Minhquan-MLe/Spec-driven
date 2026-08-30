@@ -47,9 +47,31 @@ next.
   `overflow-x: auto` container so long unbreakable content (ISO
   timestamps, agent IDs) scrolls within the table instead of the page.
 
+## PostgreSQL Persistence & Ailment/Appointment CRUD UI (Complete)
+
+- Acted on the roadmap's long-deferred persistence note: replaced the
+  in-memory store with PostgreSQL 16, run locally via Docker Compose
+  (`compose.yaml`), accessed through a hand-written repository layer
+  (`src/db/repository/`) — no ORM.
+- Added complete Create/Read/Update/Delete for Ailments and
+  Appointments at both the JSON API (`/api/ailments`,
+  `/api/appointments`) and server-rendered dashboard-UI layers
+  (`/ailments/*`, `/appointments/*`), including transactional
+  slot reservation/release for appointments.
+- Therapies and Slots remain seeded, read-only reference data — no
+  authoring UI/API for either, per this phase's decisions.
+- Full spec, decisions, and validation evidence:
+  `specs/2026-08-30-postgres-crud-ui/`.
+- The shared connection pool handles a lost idle connection (e.g. a
+  Postgres restart) without crashing the Node process, and reconnects
+  automatically once Postgres is back — see `tech-stack.md`'s "Data"
+  section and `specs/2026-08-30-postgres-crud-ui/validation.md`'s
+  "Hotfix validation" for the live evidence.
+
 ## Notes
 
 - This order can change as feature specs are written — the roadmap is a
   starting sequence, not a fixed contract.
-- Persistence, auth, and infrastructure decisions are deliberately deferred
-  until a phase actually needs them (see `tech-stack.md`).
+- Auth and deployment/infrastructure decisions are still deliberately
+  deferred until a phase actually needs them (see `tech-stack.md`).
+  Persistence is no longer deferred — see the phase above.
