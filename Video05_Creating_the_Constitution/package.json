@@ -6,13 +6,21 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
-    "test": "vitest run"
+    "test": "vitest run",
+    "db:migrate": "tsc && node dist/db/migrate.js",
+    "db:seed": "tsc && node dist/db/seed.js",
+    "db:setup": "npm run db:migrate && npm run db:seed",
+    "db:test:create": "tsc && node dist/db/create-test-db.js",
+    "db:test:migrate": "tsc && node dist/db/migrate-test.js"
   },
   "dependencies": {
     "@hono/node-server": "  ^2.1.1",
-    "hono": "^4.13.3"
+    "dotenv": "^16.4.5",
+    "hono": "^4.13.3",
+    "pg": "^8.13.1"
   },
   "devDependencies": {
+    "@types/pg": "^8.11.10",
     "typescript": "^5.5.3",
     "vitest": "^3.2.4"
   },

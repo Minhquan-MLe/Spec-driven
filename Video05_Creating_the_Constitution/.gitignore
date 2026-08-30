@@ -9,3 +9,6 @@ yarn-error.log*
 .pnp.js
 
 .vscode/*
+
+# Local environment variables (real local DB credentials) — never commit.
+.env

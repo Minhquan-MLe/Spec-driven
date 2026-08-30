@@ -51,9 +51,20 @@
 
 ## Data
 
-- No database is committed to yet. Early phases can use in-memory or static
-  data; a persistence layer will be chosen once the ailments/therapies/
-  booking data model is defined in a feature spec.
+- **PostgreSQL 16**, run locally via Docker Compose (`compose.yaml`) —
+  see `specs/2026-08-30-postgres-crud-ui/`. Schema and starter data are
+  managed by hand-written SQL migrations under `src/db/migrations/`,
+  applied with `npm run db:migrate` and seeded with `npm run db:seed`
+  (see `README.md` for exact commands).
+- Plain **`pg`** (node-postgres) for database access — no ORM, per the
+  "keep dependencies minimal" principle above.
+- **Transitional state:** the database and its schema exist and are
+  fully runnable, but the application itself (`src/store.ts` and the
+  routes/dashboard that use it) still reads/writes an in-memory store.
+  Wiring the app to Postgres is a later phase in
+  `specs/2026-08-30-postgres-crud-ui/plan.md` — until then, restarting
+  the Node process still resets ailment/appointment data even though
+  the database itself persists.
 
 ## Non-goals (for now)
 
