@@ -8,13 +8,15 @@
 
 ## Running the app
 
+**The app now requires PostgreSQL to be running and migrated before it will start correctly** — see "Database (PostgreSQL, local dev)" below and complete steps 1–5 there first (start Docker, copy `.env`, migrate, seed). Once that's done:
+
 ```
 npm install
 npm run build
 npm start
 ```
 
-The app is then available at http://localhost:3000.
+The app is then available at http://localhost:3000. If Postgres isn't running or `.env`/`DATABASE_URL` is missing, requests will fail with a clear error (logged server-side) rather than silently falling back to any in-memory data — there is no in-memory fallback.
 
 ## Database (PostgreSQL, local dev)
 
@@ -107,10 +109,11 @@ only adds a second, empty database alongside it on the same server.
 
 ### Repository database tests
 
-`src/db/repository/` has a small set of functions that read/write
-Postgres directly (used by a later phase, not yet by the running app).
-Its integration tests connect to the **test** database and reset a few
-tables between tests, so they run separately from the normal suite:
+`src/db/repository/` holds the functions that read/write Postgres
+directly — this is what `src/store.ts` (and therefore every API route
+and the dashboard) delegates to. Its integration tests connect to the
+**test** database and reset a few tables between tests, so they run
+separately from the normal suite:
 
 ```
 npm run test:db
@@ -139,8 +142,13 @@ you want — mainly useful for starting completely fresh):
 docker compose down -v
 ```
 
-**Note:** as of this phase, the running application (`npm start`) does
-not read from or write to this database yet — it still uses the
-in-memory store in `src/store.ts`. The database exists and is fully
-set up, but wiring the app to it is a separate, later phase (see
-`specs/2026-08-30-postgres-crud-ui/plan.md`).
+**Note:** the running application (`npm start`) now reads from and
+writes to this database for every ailment/therapy/slot/appointment
+operation — `src/store.ts` has no in-memory arrays anymore. The one
+piece of state that's still intentionally in memory is the
+`Idempotency-Key` replay cache (`src/idempotency.ts`); it's small,
+short-lived, and out of scope for persistence per
+`specs/2026-08-30-postgres-crud-ui/requirements.md`. The app does
+**not** run migrations or seed data automatically on startup — always
+run `npm run db:migrate` (and `npm run db:seed`, for a fresh database)
+yourself first.

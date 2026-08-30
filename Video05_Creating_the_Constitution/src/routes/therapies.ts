@@ -3,4 +3,4 @@ import { listTherapies } from '../store'
 
 export const therapies = new Hono()
 
-therapies.get('/', (c) => c.json(listTherapies()))
+therapies.get('/', async (c) => c.json(await listTherapies()))

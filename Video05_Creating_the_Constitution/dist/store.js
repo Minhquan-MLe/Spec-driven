@@ -1,4 +1,46 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CATEGORIES = void 0;
 exports.createAilment = createAilment;
@@ -11,6 +53,19 @@ exports.listAvailableSlots = listAvailableSlots;
 exports.getSlot = getSlot;
 exports.createAppointment = createAppointment;
 exports.listAppointments = listAppointments;
+const db_1 = require("./db");
+const ailmentsRepo = __importStar(require("./db/repository/ailments"));
+const appointmentsRepo = __importStar(require("./db/repository/appointments"));
+const slotsRepo = __importStar(require("./db/repository/slots"));
+const therapiesRepo = __importStar(require("./db/repository/therapies"));
+// This module is the application's data-access surface — routes and
+// app.ts import domain types and data functions from here, same as
+// before. What changed is what's *behind* it: every function now
+// delegates to the PostgreSQL repository (src/db/repository/) via the
+// shared connection pool (getPool(), src/db/index.ts) instead of
+// reading/writing in-memory arrays. There is no in-memory fallback if
+// Postgres is unavailable — a failed query simply rejects, and Hono's
+// error handler (see app.ts) turns that into a controlled 500 response.
 exports.CATEGORIES = [
     'performance',
     'reliability',
@@ -18,109 +73,74 @@ exports.CATEGORIES = [
     'auth',
     'other',
 ];
-const ailments = [];
-const therapies = [];
-const slots = [];
-const appointments = [];
-function seed() {
-    const seedTherapies = [
-        {
-            name: 'Timeout Tuning Session',
-            description: 'Diagnose and adjust retry/backoff settings for slow-running tasks.',
-            categories: ['performance'],
-        },
-        {
-            name: 'Failover Rehearsal',
-            description: 'Practice graceful degradation and failover paths.',
-            categories: ['reliability'],
-        },
-        {
-            name: 'API Contract Alignment',
-            description: 'Resolve mismatched request/response shapes between services.',
-            categories: ['integration'],
-        },
-        {
-            name: 'Credential Refresh Clinic',
-            description: 'Fix expired tokens and misconfigured auth scopes.',
-            categories: ['auth'],
-        },
-        {
-            name: 'General Checkup',
-            description: "A catch-all consultation for anything that doesn't fit elsewhere.",
-            categories: ['other'],
-        },
-    ];
-    for (const t of seedTherapies) {
-        therapies.push(Object.assign({ id: therapies.length + 1 }, t));
-    }
-    const day = 24 * 60 * 60 * 1000;
-    const now = Date.now();
-    for (let i = 1; i <= 8; i++) {
-        slots.push({
-            id: slots.length + 1,
-            timeSlot: new Date(now + i * day).toISOString(),
-            taken: false,
-        });
-    }
-}
-seed();
 function createAilment(input) {
-    const ailment = {
-        id: ailments.length + 1,
-        agentId: input.agentId,
-        category: input.category,
-        title: input.title,
-        description: input.description,
-        status: 'open',
-        createdAt: new Date().toISOString(),
-    };
-    ailments.push(ailment);
-    return ailment;
+    return __awaiter(this, void 0, void 0, function* () {
+        return ailmentsRepo.createAilment((0, db_1.getPool)(), input);
+    });
 }
 function listAilments() {
-    return [...ailments].reverse();
+    return __awaiter(this, void 0, void 0, function* () {
+        return ailmentsRepo.listAilments((0, db_1.getPool)());
+    });
 }
+/**
+ * Route params arrive as `Number(c.req.param('id'))`, which is `NaN`
+ * for a non-numeric id (e.g. `/api/ailments/abc`). The old in-memory
+ * `.find()` quietly returned undefined for that (NaN never matches any
+ * real id) — a real SQL query would instead reject with a Postgres type
+ * error, turning a clean 404 into a 500. Guarding here preserves the
+ * original graceful-404 behavior without special-casing it in the
+ * route.
+ */
 function getAilment(id) {
-    return ailments.find((a) => a.id === id);
+    return __awaiter(this, void 0, void 0, function* () {
+        if (!Number.isInteger(id))
+            return undefined;
+        return ailmentsRepo.getAilment((0, db_1.getPool)(), id);
+    });
 }
 function listTherapies() {
-    return therapies;
+    return __awaiter(this, void 0, void 0, function* () {
+        return therapiesRepo.listTherapies((0, db_1.getPool)());
+    });
 }
 function getTherapy(id) {
-    return therapies.find((t) => t.id === id);
+    return __awaiter(this, void 0, void 0, function* () {
+        if (!Number.isInteger(id))
+            return undefined;
+        return therapiesRepo.getTherapy((0, db_1.getPool)(), id);
+    });
 }
 function therapiesForAilment(ailmentId) {
-    const ailment = getAilment(ailmentId);
-    if (!ailment)
-        return undefined;
-    return therapies.filter((t) => t.categories.includes(ailment.category));
+    return __awaiter(this, void 0, void 0, function* () {
+        if (!Number.isInteger(ailmentId))
+            return undefined;
+        return ailmentsRepo.therapiesForAilment((0, db_1.getPool)(), ailmentId);
+    });
 }
 function listAvailableSlots() {
-    return slots.filter((s) => !s.taken);
+    return __awaiter(this, void 0, void 0, function* () {
+        return slotsRepo.listAvailableSlots((0, db_1.getPool)());
+    });
 }
 function getSlot(id) {
-    return slots.find((s) => s.id === id);
+    return __awaiter(this, void 0, void 0, function* () {
+        if (!Number.isInteger(id))
+            return undefined;
+        return slotsRepo.getSlot((0, db_1.getPool)(), id);
+    });
 }
 function createAppointment(input) {
-    const therapy = getTherapy(input.therapyId);
-    if (!therapy)
-        return { ok: false, reason: 'therapy_not_found' };
-    const slot = getSlot(input.slotId);
-    if (!slot)
-        return { ok: false, reason: 'slot_not_found' };
-    if (slot.taken)
-        return { ok: false, reason: 'slot_taken' };
-    slot.taken = true;
-    const appointment = {
-        id: appointments.length + 1,
-        agentId: input.agentId,
-        therapyId: input.therapyId,
-        slotId: input.slotId,
-        createdAt: new Date().toISOString(),
-    };
-    appointments.push(appointment);
-    return { ok: true, appointment };
+    return __awaiter(this, void 0, void 0, function* () {
+        // The repository's result type also covers 'appointment_not_found'
+        // (relevant to update/delete, not implemented yet) — createAppointment
+        // itself never returns that reason, so this narrows back to the
+        // public type this module has always exposed.
+        return appointmentsRepo.createAppointment((0, db_1.getPool)(), input);
+    });
 }
 function listAppointments() {
-    return [...appointments].reverse();
+    return __awaiter(this, void 0, void 0, function* () {
+        return appointmentsRepo.listAppointments((0, db_1.getPool)());
+    });
 }

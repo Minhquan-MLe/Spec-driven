@@ -30,7 +30,7 @@ appointments.post('/', async (c) => {
     )
   }
 
-  const result = createAppointment({ agentId, therapyId, slotId })
+  const result = await createAppointment({ agentId, therapyId, slotId })
 
   if (!result.ok) {
     if (result.reason === 'slot_taken') {
@@ -48,4 +48,4 @@ appointments.post('/', async (c) => {
   return c.json(result.appointment, 201)
 })
 
-appointments.get('/', (c) => c.json(listAppointments()))
+appointments.get('/', async (c) => c.json(await listAppointments()))

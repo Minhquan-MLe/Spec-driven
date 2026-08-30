@@ -38,7 +38,7 @@ exports.ailments.post('/', (c) => __awaiter(void 0, void 0, void 0, function* ()
     if (!store_1.CATEGORIES.includes(category)) {
         return c.json({ error: `category must be one of: ${store_1.CATEGORIES.join(', ')}` }, 400);
     }
-    const ailment = (0, store_1.createAilment)({
+    const ailment = yield (0, store_1.createAilment)({
         agentId,
         category: category,
         title,
@@ -52,16 +52,16 @@ exports.ailments.post('/', (c) => __awaiter(void 0, void 0, void 0, function* ()
     }
     return c.json(ailment, 201);
 }));
-exports.ailments.get('/', (c) => c.json((0, store_1.listAilments)()));
-exports.ailments.get('/:id', (c) => {
-    const ailment = (0, store_1.getAilment)(Number(c.req.param('id')));
+exports.ailments.get('/', (c) => __awaiter(void 0, void 0, void 0, function* () { return c.json(yield (0, store_1.listAilments)()); }));
+exports.ailments.get('/:id', (c) => __awaiter(void 0, void 0, void 0, function* () {
+    const ailment = yield (0, store_1.getAilment)(Number(c.req.param('id')));
     if (!ailment)
         return c.json({ error: 'ailment not found' }, 404);
     return c.json(ailment);
-});
-exports.ailments.get('/:id/therapies', (c) => {
-    const therapies = (0, store_1.therapiesForAilment)(Number(c.req.param('id')));
+}));
+exports.ailments.get('/:id/therapies', (c) => __awaiter(void 0, void 0, void 0, function* () {
+    const therapies = yield (0, store_1.therapiesForAilment)(Number(c.req.param('id')));
     if (!therapies)
         return c.json({ error: 'ailment not found' }, 404);
     return c.json(therapies);
-});
+}));

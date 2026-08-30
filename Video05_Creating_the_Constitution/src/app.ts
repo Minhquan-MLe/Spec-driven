@@ -16,6 +16,17 @@ import {
 
 export const app = new Hono()
 
+// Postgres queries can fail (connection dropped, constraint violation,
+// etc.); without this, Hono's default error handling could leak a raw
+// error message — potentially including SQL or connection details —
+// back to the client. This ensures every unhandled failure becomes a
+// generic, controlled response instead. There is no in-memory fallback
+// here: a database failure is a real failure, surfaced as a 500.
+app.onError((err, c) => {
+  console.error(err)
+  return c.json({ error: 'internal server error' }, 500)
+})
+
 app.use('/*', serveStatic({ root: './public' }))
 
 app.route('/api/ailments', ailments)
@@ -33,28 +44,38 @@ app.get('/', (c) => {
   return c.html(layout('AgentClinic', content))
 })
 
-app.get('/dashboard', (c) => {
-  const ailmentRows = listAilments()
+app.get('/dashboard', async (c) => {
+  const [ailmentList, therapyList, appointmentList] = await Promise.all([
+    listAilments(),
+    listTherapies(),
+    listAppointments(),
+  ])
+
+  const ailmentRows = ailmentList
     .map(
       (a) =>
         `<tr><td>${a.id}</td><td>${escapeHtml(a.category)}</td><td>${escapeHtml(a.title)}</td><td><mark>${escapeHtml(a.status)}</mark></td></tr>`
     )
     .join('')
 
-  const therapyRows = listTherapies()
+  const therapyRows = therapyList
     .map(
       (t) =>
         `<tr><td>${escapeHtml(t.name)}</td><td>${escapeHtml(t.categories.join(', '))}</td></tr>`
     )
     .join('')
 
-  const appointmentRows = listAppointments()
-    .map((appt) => {
-      const therapy = getTherapy(appt.therapyId)
-      const slot = getSlot(appt.slotId)
-      return `<tr><td>${escapeHtml(appt.agentId)}</td><td>${escapeHtml(therapy?.name ?? 'Unknown')}</td><td>${escapeHtml(slot?.timeSlot ?? 'Unknown')}</td></tr>`
-    })
-    .join('')
+  const appointmentRows = (
+    await Promise.all(
+      appointmentList.map(async (appt) => {
+        const [therapy, slot] = await Promise.all([
+          getTherapy(appt.therapyId),
+          getSlot(appt.slotId),
+        ])
+        return `<tr><td>${escapeHtml(appt.agentId)}</td><td>${escapeHtml(therapy?.name ?? 'Unknown')}</td><td>${escapeHtml(slot?.timeSlot ?? 'Unknown')}</td></tr>`
+      })
+    )
+  ).join('')
 
   const content = `
     <h1>Dashboard</h1>

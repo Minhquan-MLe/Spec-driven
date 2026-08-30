@@ -1,4 +1,10 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+
+// Uses the in-memory manual mock at src/__mocks__/store.ts instead of
+// the real ../store (which talks to PostgreSQL) — keeps this suite
+// independent of a live database.
+vi.mock('../store')
+
 import { app } from '../app'
 
 async function firstAvailableSlotId(): Promise<number> {

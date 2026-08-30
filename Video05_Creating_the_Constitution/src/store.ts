@@ -1,3 +1,18 @@
+import { getPool } from './db'
+import * as ailmentsRepo from './db/repository/ailments'
+import * as appointmentsRepo from './db/repository/appointments'
+import * as slotsRepo from './db/repository/slots'
+import * as therapiesRepo from './db/repository/therapies'
+
+// This module is the application's data-access surface — routes and
+// app.ts import domain types and data functions from here, same as
+// before. What changed is what's *behind* it: every function now
+// delegates to the PostgreSQL repository (src/db/repository/) via the
+// shared connection pool (getPool(), src/db/index.ts) instead of
+// reading/writing in-memory arrays. There is no in-memory fallback if
+// Postgres is unavailable — a failed query simply rejects, and Hono's
+// error handler (see app.ts) turns that into a controlled 500 response.
+
 export const CATEGORIES = [
   'performance',
   'reliability',
@@ -39,135 +54,72 @@ export interface Appointment {
   createdAt: string
 }
 
-const ailments: Ailment[] = []
-const therapies: Therapy[] = []
-const slots: Slot[] = []
-const appointments: Appointment[] = []
-
-function seed(): void {
-  const seedTherapies: Array<Omit<Therapy, 'id'>> = [
-    {
-      name: 'Timeout Tuning Session',
-      description:
-        'Diagnose and adjust retry/backoff settings for slow-running tasks.',
-      categories: ['performance'],
-    },
-    {
-      name: 'Failover Rehearsal',
-      description: 'Practice graceful degradation and failover paths.',
-      categories: ['reliability'],
-    },
-    {
-      name: 'API Contract Alignment',
-      description:
-        'Resolve mismatched request/response shapes between services.',
-      categories: ['integration'],
-    },
-    {
-      name: 'Credential Refresh Clinic',
-      description: 'Fix expired tokens and misconfigured auth scopes.',
-      categories: ['auth'],
-    },
-    {
-      name: 'General Checkup',
-      description: "A catch-all consultation for anything that doesn't fit elsewhere.",
-      categories: ['other'],
-    },
-  ]
-  for (const t of seedTherapies) {
-    therapies.push({ id: therapies.length + 1, ...t })
-  }
-
-  const day = 24 * 60 * 60 * 1000
-  const now = Date.now()
-  for (let i = 1; i <= 8; i++) {
-    slots.push({
-      id: slots.length + 1,
-      timeSlot: new Date(now + i * day).toISOString(),
-      taken: false,
-    })
-  }
-}
-
-seed()
-
-export function createAilment(input: {
+export async function createAilment(input: {
   agentId: string
   category: Category
   title: string
   description: string
-}): Ailment {
-  const ailment: Ailment = {
-    id: ailments.length + 1,
-    agentId: input.agentId,
-    category: input.category,
-    title: input.title,
-    description: input.description,
-    status: 'open',
-    createdAt: new Date().toISOString(),
-  }
-  ailments.push(ailment)
-  return ailment
+}): Promise<Ailment> {
+  return ailmentsRepo.createAilment(getPool(), input)
 }
 
-export function listAilments(): Ailment[] {
-  return [...ailments].reverse()
+export async function listAilments(): Promise<Ailment[]> {
+  return ailmentsRepo.listAilments(getPool())
 }
 
-export function getAilment(id: number): Ailment | undefined {
-  return ailments.find((a) => a.id === id)
+/**
+ * Route params arrive as `Number(c.req.param('id'))`, which is `NaN`
+ * for a non-numeric id (e.g. `/api/ailments/abc`). The old in-memory
+ * `.find()` quietly returned undefined for that (NaN never matches any
+ * real id) — a real SQL query would instead reject with a Postgres type
+ * error, turning a clean 404 into a 500. Guarding here preserves the
+ * original graceful-404 behavior without special-casing it in the
+ * route.
+ */
+export async function getAilment(id: number): Promise<Ailment | undefined> {
+  if (!Number.isInteger(id)) return undefined
+  return ailmentsRepo.getAilment(getPool(), id)
 }
 
-export function listTherapies(): Therapy[] {
-  return therapies
+export async function listTherapies(): Promise<Therapy[]> {
+  return therapiesRepo.listTherapies(getPool())
 }
 
-export function getTherapy(id: number): Therapy | undefined {
-  return therapies.find((t) => t.id === id)
+export async function getTherapy(id: number): Promise<Therapy | undefined> {
+  if (!Number.isInteger(id)) return undefined
+  return therapiesRepo.getTherapy(getPool(), id)
 }
 
-export function therapiesForAilment(ailmentId: number): Therapy[] | undefined {
-  const ailment = getAilment(ailmentId)
-  if (!ailment) return undefined
-  return therapies.filter((t) => t.categories.includes(ailment.category))
+export async function therapiesForAilment(ailmentId: number): Promise<Therapy[] | undefined> {
+  if (!Number.isInteger(ailmentId)) return undefined
+  return ailmentsRepo.therapiesForAilment(getPool(), ailmentId)
 }
 
-export function listAvailableSlots(): Slot[] {
-  return slots.filter((s) => !s.taken)
+export async function listAvailableSlots(): Promise<Slot[]> {
+  return slotsRepo.listAvailableSlots(getPool())
 }
 
-export function getSlot(id: number): Slot | undefined {
-  return slots.find((s) => s.id === id)
+export async function getSlot(id: number): Promise<Slot | undefined> {
+  if (!Number.isInteger(id)) return undefined
+  return slotsRepo.getSlot(getPool(), id)
 }
 
 export type CreateAppointmentResult =
   | { ok: true; appointment: Appointment }
   | { ok: false; reason: 'therapy_not_found' | 'slot_not_found' | 'slot_taken' }
 
-export function createAppointment(input: {
+export async function createAppointment(input: {
   agentId: string
   therapyId: number
   slotId: number
-}): CreateAppointmentResult {
-  const therapy = getTherapy(input.therapyId)
-  if (!therapy) return { ok: false, reason: 'therapy_not_found' }
-
-  const slot = getSlot(input.slotId)
-  if (!slot) return { ok: false, reason: 'slot_not_found' }
-  if (slot.taken) return { ok: false, reason: 'slot_taken' }
-
-  slot.taken = true
-  const appointment: Appointment = {
-    id: appointments.length + 1,
-    agentId: input.agentId,
-    therapyId: input.therapyId,
-    slotId: input.slotId,
-    createdAt: new Date().toISOString(),
-  }
-  appointments.push(appointment)
-  return { ok: true, appointment }
+}): Promise<CreateAppointmentResult> {
+  // The repository's result type also covers 'appointment_not_found'
+  // (relevant to update/delete, not implemented yet) — createAppointment
+  // itself never returns that reason, so this narrows back to the
+  // public type this module has always exposed.
+  return appointmentsRepo.createAppointment(getPool(), input) as Promise<CreateAppointmentResult>
 }
 
-export function listAppointments(): Appointment[] {
-  return [...appointments].reverse()
+export async function listAppointments(): Promise<Appointment[]> {
+  return appointmentsRepo.listAppointments(getPool())
 }

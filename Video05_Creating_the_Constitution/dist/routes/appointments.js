@@ -34,7 +34,7 @@ exports.appointments.post('/', (c) => __awaiter(void 0, void 0, void 0, function
             error: 'agentId (string), therapyId (positive integer), and slotId (positive integer) are required',
         }, 400);
     }
-    const result = (0, store_1.createAppointment)({ agentId, therapyId, slotId });
+    const result = yield (0, store_1.createAppointment)({ agentId, therapyId, slotId });
     if (!result.ok) {
         if (result.reason === 'slot_taken') {
             return c.json({ error: 'slot already taken' }, 409);
@@ -49,4 +49,4 @@ exports.appointments.post('/', (c) => __awaiter(void 0, void 0, void 0, function
     }
     return c.json(result.appointment, 201);
 }));
-exports.appointments.get('/', (c) => c.json((0, store_1.listAppointments)()));
+exports.appointments.get('/', (c) => __awaiter(void 0, void 0, void 0, function* () { return c.json(yield (0, store_1.listAppointments)()); }));

@@ -46,7 +46,7 @@ ailments.post('/', async (c) => {
     )
   }
 
-  const ailment = createAilment({
+  const ailment = await createAilment({
     agentId,
     category: category as Category,
     title,
@@ -61,16 +61,16 @@ ailments.post('/', async (c) => {
   return c.json(ailment, 201)
 })
 
-ailments.get('/', (c) => c.json(listAilments()))
+ailments.get('/', async (c) => c.json(await listAilments()))
 
-ailments.get('/:id', (c) => {
-  const ailment = getAilment(Number(c.req.param('id')))
+ailments.get('/:id', async (c) => {
+  const ailment = await getAilment(Number(c.req.param('id')))
   if (!ailment) return c.json({ error: 'ailment not found' }, 404)
   return c.json(ailment)
 })
 
-ailments.get('/:id/therapies', (c) => {
-  const therapies = therapiesForAilment(Number(c.req.param('id')))
+ailments.get('/:id/therapies', async (c) => {
+  const therapies = await therapiesForAilment(Number(c.req.param('id')))
   if (!therapies) return c.json({ error: 'ailment not found' }, 404)
   return c.json(therapies)
 })
