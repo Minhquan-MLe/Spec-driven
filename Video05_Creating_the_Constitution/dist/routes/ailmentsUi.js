@@ -46,7 +46,7 @@ function validateCoreFields(values) {
         !(0, validation_1.isNonEmptyString)(values.title) ||
         !(0, validation_1.isNonEmptyString)(values.description) ||
         !(0, validation_1.isNonEmptyString)(values.category)) {
-        return 'Agent ID, category, title, and description are all required.';
+        return 'Agent Name, category, title, and description are all required.';
     }
     if (!store_1.CATEGORIES.includes(values.category)) {
         return `Category must be one of: ${store_1.CATEGORIES.join(', ')}.`;
