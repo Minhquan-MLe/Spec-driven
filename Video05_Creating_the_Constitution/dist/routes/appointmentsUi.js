@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.appointmentsUi = void 0;
 const hono_1 = require("hono");
 const appointmentForm_1 = require("../components/appointmentForm");
+const dateFormat_1 = require("../dateFormat");
 const html_1 = require("../html");
 const layout_1 = require("../layout");
 const store_1 = require("../store");
@@ -25,11 +26,6 @@ const validation_1 = require("../validation");
 exports.appointmentsUi = new hono_1.Hono();
 function formString(value) {
     return typeof value === 'string' ? value : '';
-}
-/** Deterministic, timezone-explicit "YYYY-MM-DD HH:MM UTC" label. */
-function formatSlotLabel(timeSlot) {
-    const iso = new Date(timeSlot).toISOString();
-    return `${iso.slice(0, 10)} ${iso.slice(11, 16)} UTC`;
 }
 function renderNotFound(message) {
     return (0, layout_1.layout)('AgentClinic — Not Found', `
@@ -56,12 +52,12 @@ function buildSlotOptions(currentSlotId) {
         const available = yield (0, store_1.listAvailableSlots)();
         const options = available.map((s) => ({
             id: s.id,
-            label: formatSlotLabel(s.timeSlot),
+            label: (0, dateFormat_1.formatSlotLabel)(s.timeSlot),
         }));
         if (currentSlotId !== undefined && !options.some((o) => o.id === currentSlotId)) {
             const currentSlot = yield (0, store_1.getSlot)(currentSlotId);
             if (currentSlot) {
-                options.push({ id: currentSlot.id, label: formatSlotLabel(currentSlot.timeSlot), isCurrent: true });
+                options.push({ id: currentSlot.id, label: (0, dateFormat_1.formatSlotLabel)(currentSlot.timeSlot), isCurrent: true });
             }
         }
         return options.sort((a, b) => a.id - b.id);
@@ -96,7 +92,7 @@ exports.appointmentsUi.post('/new', (c) => __awaiter(void 0, void 0, void 0, fun
     const slotId = (0, validation_1.parsePositiveInt)(values.slotId);
     if (!(0, validation_1.isNonEmptyString)(values.agentId) || therapyId === null || slotId === null) {
         const [therapyOptions, slotOptions] = yield Promise.all([buildTherapyOptions(), buildSlotOptions()]);
-        return c.html(renderFormPage('new', undefined, values, therapyOptions, slotOptions, 'Agent ID, therapy, and slot are all required.'), 400);
+        return c.html(renderFormPage('new', undefined, values, therapyOptions, slotOptions, 'Agent Name, therapy, and slot are all required.'), 400);
     }
     const result = yield (0, store_1.createAppointment)({ agentId: values.agentId, therapyId, slotId });
     if (!result.ok) {
@@ -141,7 +137,7 @@ exports.appointmentsUi.post('/:id/edit', (c) => __awaiter(void 0, void 0, void 0
             buildTherapyOptions(),
             buildSlotOptions(existing.slotId),
         ]);
-        return c.html(renderFormPage('edit', id, values, therapyOptions, slotOptions, 'Agent ID, therapy, and slot are all required.'), 400);
+        return c.html(renderFormPage('edit', id, values, therapyOptions, slotOptions, 'Agent Name, therapy, and slot are all required.'), 400);
     }
     const result = yield (0, store_1.updateAppointment)(id, { agentId: values.agentId, therapyId, slotId });
     if (!result.ok) {

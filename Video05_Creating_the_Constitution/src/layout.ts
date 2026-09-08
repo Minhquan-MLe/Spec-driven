@@ -1,8 +1,8 @@
 import { header } from './components/header'
-import { main } from './components/main'
+import { main, type MainOptions } from './components/main'
 import { footer } from './components/footer'
 
-export function layout(title: string, content: string): string {
+export function layout(title: string, content: string, options: MainOptions = {}): string {
   return `<!doctype html>
 <html lang="en">
   <head>
@@ -17,7 +17,7 @@ export function layout(title: string, content: string): string {
   </head>
   <body>
     ${header()}
-    ${main(content)}
+    ${main(content, options)}
     ${footer()}
   </body>
 </html>`

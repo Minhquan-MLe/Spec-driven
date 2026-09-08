@@ -4,7 +4,7 @@ exports.layout = layout;
 const header_1 = require("./components/header");
 const main_1 = require("./components/main");
 const footer_1 = require("./components/footer");
-function layout(title, content) {
+function layout(title, content, options = {}) {
     return `<!doctype html>
 <html lang="en">
   <head>
@@ -19,7 +19,7 @@ function layout(title, content) {
   </head>
   <body>
     ${(0, header_1.header)()}
-    ${(0, main_1.main)(content)}
+    ${(0, main_1.main)(content, options)}
     ${(0, footer_1.footer)()}
   </body>
 </html>`;

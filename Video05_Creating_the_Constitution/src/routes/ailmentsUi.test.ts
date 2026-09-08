@@ -42,6 +42,7 @@ describe('GET /ailments/new', () => {
 
     expect(res.status).toBe(200)
     expect(body).toContain('<h1>New Ailment</h1>')
+    expect(body).toContain('Agent Name')
     expect(body).toContain('name="agentId"')
     expect(body).toContain('name="category"')
     expect(body).toContain('name="title"')

@@ -1,5 +1,6 @@
 import { serveStatic } from '@hono/node-server/serve-static'
 import { Hono } from 'hono'
+import { formatSlotLabel } from './dateFormat'
 import { escapeHtml } from './html'
 import { layout } from './layout'
 import { ailments } from './routes/ailments'
@@ -90,7 +91,7 @@ app.get('/dashboard', async (c) => {
         return `<tr>
           <td>${escapeHtml(appt.agentId)}</td>
           <td>${escapeHtml(therapy?.name ?? 'Unknown')}</td>
-          <td>${escapeHtml(slot?.timeSlot ?? 'Unknown')}</td>
+          <td>${escapeHtml(slot ? formatSlotLabel(slot.timeSlot) : 'Unknown')}</td>
           <td class="actions">
             <a href="/appointments/${appt.id}/edit" role="button" class="secondary">Edit</a>
             <form method="POST" action="/appointments/${appt.id}/delete" onsubmit="return confirm('Delete this appointment?')">
@@ -131,11 +132,11 @@ app.get('/dashboard', async (c) => {
       <p><a href="/appointments/new" role="button">New Appointment</a></p>
       <div class="table-responsive">
         <table>
-          <thead><tr><th>Agent</th><th>Therapy</th><th>Time</th><th>Actions</th></tr></thead>
+          <thead><tr><th>Agent Name</th><th>Therapy</th><th>Time</th><th>Actions</th></tr></thead>
           <tbody>${appointmentRows || '<tr><td colspan="4">No appointments booked yet.</td></tr>'}</tbody>
         </table>
       </div>
     </section>
   `
-  return c.html(layout('AgentClinic — Dashboard', content))
+  return c.html(layout('AgentClinic — Dashboard', content, { wide: true }))
 })

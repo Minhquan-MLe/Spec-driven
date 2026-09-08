@@ -1,9 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.main = main;
-function main(content) {
+function main(content, options = {}) {
+    const className = options.wide ? 'content content--wide' : 'content';
     return `
-    <main class="content">
+    <main class="${className}">
       ${content}
     </main>
   `;

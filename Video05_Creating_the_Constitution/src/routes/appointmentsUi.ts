@@ -5,6 +5,7 @@ import {
   type AppointmentSlotOption,
   type AppointmentTherapyOption,
 } from '../components/appointmentForm'
+import { formatSlotLabel } from '../dateFormat'
 import { escapeHtml } from '../html'
 import { layout } from '../layout'
 import {
@@ -30,12 +31,6 @@ export const appointmentsUi = new Hono()
 
 function formString(value: unknown): string {
   return typeof value === 'string' ? value : ''
-}
-
-/** Deterministic, timezone-explicit "YYYY-MM-DD HH:MM UTC" label. */
-function formatSlotLabel(timeSlot: string): string {
-  const iso = new Date(timeSlot).toISOString()
-  return `${iso.slice(0, 10)} ${iso.slice(11, 16)} UTC`
 }
 
 function renderNotFound(message: string): string {
@@ -128,7 +123,7 @@ appointmentsUi.post('/new', async (c) => {
         values,
         therapyOptions,
         slotOptions,
-        'Agent ID, therapy, and slot are all required.'
+        'Agent Name, therapy, and slot are all required.'
       ),
       400
     )
@@ -204,7 +199,7 @@ appointmentsUi.post('/:id/edit', async (c) => {
         values,
         therapyOptions,
         slotOptions,
-        'Agent ID, therapy, and slot are all required.'
+        'Agent Name, therapy, and slot are all required.'
       ),
       400
     )
