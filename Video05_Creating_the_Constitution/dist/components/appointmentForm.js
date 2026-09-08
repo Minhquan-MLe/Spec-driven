@@ -42,7 +42,7 @@ function appointmentForm(options) {
     <p><small>Fields marked <span aria-hidden="true">*</span> are required.</small></p>
     ${errorBlock}
     <form method="POST" action="${(0, html_1.escapeHtml)(actionPath)}">
-      <label for="agentId">Agent ID <span aria-hidden="true">*</span></label>
+      <label for="agentId">Agent Name <span aria-hidden="true">*</span></label>
       <input
         type="text"
         id="agentId"

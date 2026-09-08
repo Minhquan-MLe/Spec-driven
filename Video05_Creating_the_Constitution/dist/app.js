@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.app = void 0;
 const serve_static_1 = require("@hono/node-server/serve-static");
 const hono_1 = require("hono");
+const dateFormat_1 = require("./dateFormat");
 const html_1 = require("./html");
 const layout_1 = require("./layout");
 const ailments_1 = require("./routes/ailments");
@@ -72,7 +73,7 @@ exports.app.get('/dashboard', (c) => __awaiter(void 0, void 0, void 0, function*
         .map((t) => `<tr><td>${(0, html_1.escapeHtml)(t.name)}</td><td>${(0, html_1.escapeHtml)(t.categories.join(', '))}</td></tr>`)
         .join('');
     const appointmentRows = (yield Promise.all(appointmentList.map((appt) => __awaiter(void 0, void 0, void 0, function* () {
-        var _a, _b;
+        var _a;
         const [therapy, slot] = yield Promise.all([
             (0, store_1.getTherapy)(appt.therapyId),
             (0, store_1.getSlot)(appt.slotId),
@@ -80,7 +81,7 @@ exports.app.get('/dashboard', (c) => __awaiter(void 0, void 0, void 0, function*
         return `<tr>
           <td>${(0, html_1.escapeHtml)(appt.agentId)}</td>
           <td>${(0, html_1.escapeHtml)((_a = therapy === null || therapy === void 0 ? void 0 : therapy.name) !== null && _a !== void 0 ? _a : 'Unknown')}</td>
-          <td>${(0, html_1.escapeHtml)((_b = slot === null || slot === void 0 ? void 0 : slot.timeSlot) !== null && _b !== void 0 ? _b : 'Unknown')}</td>
+          <td>${(0, html_1.escapeHtml)(slot ? (0, dateFormat_1.formatSlotLabel)(slot.timeSlot) : 'Unknown')}</td>
           <td class="actions">
             <a href="/appointments/${appt.id}/edit" role="button" class="secondary">Edit</a>
             <form method="POST" action="/appointments/${appt.id}/delete" onsubmit="return confirm('Delete this appointment?')">
@@ -118,11 +119,11 @@ exports.app.get('/dashboard', (c) => __awaiter(void 0, void 0, void 0, function*
       <p><a href="/appointments/new" role="button">New Appointment</a></p>
       <div class="table-responsive">
         <table>
-          <thead><tr><th>Agent</th><th>Therapy</th><th>Time</th><th>Actions</th></tr></thead>
+          <thead><tr><th>Agent Name</th><th>Therapy</th><th>Time</th><th>Actions</th></tr></thead>
           <tbody>${appointmentRows || '<tr><td colspan="4">No appointments booked yet.</td></tr>'}</tbody>
         </table>
       </div>
     </section>
   `;
-    return c.html((0, layout_1.layout)('AgentClinic — Dashboard', content));
+    return c.html((0, layout_1.layout)('AgentClinic — Dashboard', content, { wide: true }));
 }));

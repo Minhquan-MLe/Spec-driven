@@ -24,8 +24,12 @@
   padding: 0 1.5rem;
 }
 
-.content a {
-  color: #14213d;
+/* Dashboard-only: the Ailments/Appointments/Therapies tables need more
+   room than the default 640px content column gives them. Links inside
+   .content intentionally use PicoCSS's own theme-aware link color (no
+   override here) so they stay readable in both light and dark mode. */
+.content--wide {
+  max-width: 960px;
 }
 
 .table-responsive {
@@ -34,9 +38,10 @@
 
 .actions {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   gap: 0.5rem;
+  min-width: 12rem;
 }
 
 .actions form {
@@ -70,5 +75,10 @@
   .site-footer {
     padding-left: 1rem;
     padding-right: 1rem;
+  }
+
+  .actions {
+    flex-wrap: wrap;
+    min-width: 0;
   }
 }

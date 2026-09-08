@@ -58,6 +58,7 @@ describe('GET /appointments/new', () => {
 
     expect(res.status).toBe(200)
     expect(body).toContain('<h1>New Appointment</h1>')
+    expect(body).toContain('Agent Name')
     expect(body).toContain('name="agentId"')
     expect(body).toContain('<select id="therapyId" name="therapyId" required>')
     expect(body).toContain('<select id="slotId" name="slotId" required>')

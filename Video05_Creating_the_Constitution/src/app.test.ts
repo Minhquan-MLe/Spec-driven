@@ -28,6 +28,12 @@ describe('/', () => {
     expect(body).toContain('<header class="site-header">')
     expect(body).toContain('<footer class="site-footer">')
   })
+
+  it('uses the ordinary (non-wide) content container', async () => {
+    const body = await (await app.request('/')).text()
+    expect(body).toContain('<main class="content">')
+    expect(body).not.toContain('content--wide')
+  })
 })
 
 describe('/dashboard', () => {
@@ -39,6 +45,16 @@ describe('/dashboard', () => {
     expect(body).toContain('<h1>Dashboard</h1>')
     expect(body).toContain('<header class="site-header">')
     expect(body).toContain('<footer class="site-footer">')
+  })
+
+  it('uses the wide content container', async () => {
+    const body = await (await app.request('/dashboard')).text()
+    expect(body).toContain('<main class="content content--wide">')
+  })
+
+  it('labels the Appointments agent column "Agent Name"', async () => {
+    const body = await (await app.request('/dashboard')).text()
+    expect(body).toContain('<th>Agent Name</th>')
   })
 
   it('renders ailments, therapies, and appointments sourced from the store', async () => {
@@ -68,6 +84,24 @@ describe('/dashboard', () => {
     expect(body).toContain('Dashboard-visible ailment')
     expect(body).toContain('Timeout Tuning Session')
     expect(body).toContain('agent-dashboard')
+  })
+
+  it('formats the appointment time as a human-readable UTC label, not a raw ISO timestamp', async () => {
+    const slotId = (await (await app.request('/api/slots')).json())[0].id
+    await app.request('/api/appointments', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        agentId: 'agent-dashboard',
+        therapyId: 1,
+        slotId,
+      }),
+    })
+
+    const body = await (await app.request('/dashboard')).text()
+
+    expect(body).toMatch(/\d{4}-\d{2}-\d{2} \d{2}:\d{2} UTC/)
+    expect(body).not.toContain('.000Z')
   })
 
   it('escapes ailment fields so they cannot break out of the table markup', async () => {
