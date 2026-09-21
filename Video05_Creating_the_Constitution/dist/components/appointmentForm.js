@@ -59,8 +59,10 @@ function appointmentForm(options) {
 
       ${slotField}
 
-      <button type="submit"${noSlotsAvailable ? ' disabled' : ''}>${mode === 'new' ? 'Create appointment' : 'Save changes'}</button>
-      <a href="/dashboard" role="button" class="secondary">Cancel</a>
+      <div class="form-actions">
+        <button type="submit"${noSlotsAvailable ? ' disabled' : ''}>${mode === 'new' ? 'Create appointment' : 'Save changes'}</button>
+        <a href="/dashboard" role="button" class="secondary">Cancel</a>
+      </div>
     </form>
   `;
 }

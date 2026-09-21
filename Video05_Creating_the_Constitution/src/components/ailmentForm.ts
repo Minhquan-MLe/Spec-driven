@@ -81,8 +81,10 @@ export function ailmentForm(options: AilmentFormOptions): string {
 
       ${statusField}
 
-      <button type="submit">${mode === 'new' ? 'Create ailment' : 'Save changes'}</button>
-      <a href="/dashboard" role="button" class="secondary">Cancel</a>
+      <div class="form-actions">
+        <button type="submit">${mode === 'new' ? 'Create ailment' : 'Save changes'}</button>
+        <a href="/dashboard" role="button" class="secondary">Cancel</a>
+      </div>
     </form>
   `
 }

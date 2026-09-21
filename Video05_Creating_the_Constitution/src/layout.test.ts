@@ -10,7 +10,8 @@ describe('layout', () => {
       '<meta name="viewport" content="width=device-width, initial-scale=1.0" />'
     )
     expect(html).toContain('cdn.jsdelivr.net/npm/@picocss/pico')
-    expect(html).toContain('<link rel="stylesheet" href="/styles.css" />')
+    // Versioned so a changed stylesheet is never masked by a stale browser cache.
+    expect(html).toMatch(/<link rel="stylesheet" href="\/styles\.css\?v=\d+" \/>/)
     expect(html).toContain('<header class="site-header">')
     expect(html).toContain('<main class="content">')
     expect(html).toContain('<p>body content</p>')
