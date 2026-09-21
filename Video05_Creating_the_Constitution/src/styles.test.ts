@@ -32,6 +32,18 @@ describe('styles.css', () => {
     expect(actionsRule).toMatch(/min-width:/)
   })
 
+  it('sizes dashboard Edit/Delete to their text with no Pico margin (keeps them aligned)', () => {
+    const rule = css.match(/\.actions button,\s*\.actions \[role='button'\]\s*{[^}]*}/)?.[0] ?? ''
+    expect(rule).toMatch(/width:\s*auto/)
+    expect(rule).toMatch(/margin:\s*0/)
+  })
+
+  it('stops Pico from stretching form submit buttons full-width', () => {
+    const rule = css.match(/\.form-actions button,\s*\.form-actions \[role='button'\]\s*{[^}]*}/)?.[0] ?? ''
+    expect(rule).toMatch(/width:\s*auto/)
+    expect(rule).toMatch(/margin:\s*0/)
+  })
+
   it('restores Actions wrapping only on narrow/mobile screens', () => {
     const mediaQueryStart = css.indexOf('@media (max-width: 480px)')
     expect(mediaQueryStart).toBeGreaterThan(-1)
