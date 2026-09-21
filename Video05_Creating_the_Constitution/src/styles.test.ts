@@ -38,6 +38,12 @@ describe('styles.css', () => {
     expect(rule).toMatch(/margin:\s*0/)
   })
 
+  it('sizes the form-actions column to its widest button so submit and Cancel match', () => {
+    const rule = css.match(/\.form-actions\s*{[^}]*}/)?.[0] ?? ''
+    expect(rule).toMatch(/display:\s*grid/)
+    expect(rule).toMatch(/justify-content:\s*start/)
+  })
+
   it('stops Pico from stretching form submit buttons full-width', () => {
     const rule = css.match(/\.form-actions button,\s*\.form-actions \[role='button'\]\s*{[^}]*}/)?.[0] ?? ''
     expect(rule).toMatch(/width:\s*auto/)
