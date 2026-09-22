@@ -60,21 +60,20 @@
   font-size: 0.9rem;
 }
 
-/* Form buttons: the primary submit and Cancel are stacked with a gap. The
-   single grid column is only as wide as the widest button (justify-content:
-   start stops it stretching to the form), and each button fills that column
-   (default justify-self: stretch), so both always end up the same width
-   without hardcoding one. Height/padding/font come from Pico and already
-   match. */
+/* Form buttons: the primary submit and Cancel are stacked with a gap, both
+   spanning the full form width (matching Pico's own full-width
+   [type=submit] look). Cancel is a <a role="button">, which doesn't get
+   Pico's width:100% the way [type=submit] does, so width is set explicitly
+   here for both instead of relying on the element type. */
 .form-actions {
-  display: grid;
-  justify-content: start;
+  display: flex;
+  flex-direction: column;
   gap: 0.75rem;
 }
 
 .form-actions button,
 .form-actions [role='button'] {
-  width: auto;
+  width: 100%;
   margin: 0;
 }
 
